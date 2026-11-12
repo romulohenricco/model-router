@@ -42,12 +42,12 @@ test("disabled MiniMax falls back safely", () => {
   const disabledCatalog = structuredClone(catalog);
   disabledCatalog.providers.minimax.enabled = false;
   const decision = routeTask({ category: "documentation" }, disabledCatalog, policy);
-  assert.equal(decision.primary.model, "claude-sonnet-5-5");
+  assert.equal(decision.primary.model, "gpt-6-luna");
 });
 
 test("confidential work never routes to MiniMax or GLM", () => {
   const decision = route({ category: "documentation", sensitivity: "confidential" });
-  assert.equal(decision.primary.model, "claude-sonnet-5-5");
+  assert.equal(decision.primary.model, "gpt-6-luna");
   assert.notEqual(decision.primary.provider, "minimax");
   assert.notEqual(decision.primary.provider, "glm");
 });

@@ -115,9 +115,10 @@
     "documentation": {
       "primary": "minimax-m2.7",
       "fallbacks": [
+        "gpt-6-luna",
+        "claude-haiku-5-5",
         "claude-sonnet-5-5",
         "claude-sonnet-5",
-        "claude-haiku-5-5",
         "gpt-6.1-terra"
       ],
       "verifiers": [
