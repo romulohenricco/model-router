@@ -144,6 +144,9 @@ export function routeTask(rawInput, catalog, policy) {
     verifier = verifierId ? selection(verifierId, catalog, input, route) : null;
     if (verifier && (highRisk || dangerous)) {
       const floor = policy.guardrails.high_risk_verifier_min_effort ?? "high";
+      if (!EFFORT_ORDER.includes(floor)) {
+        throw new Error(`Invalid guardrails.high_risk_verifier_min_effort: ${floor}`);
+      }
       const raised = atLeast(verifier.effort, floor);
       if (raised !== verifier.effort) {
         reasons.push(`Esforço do verificador elevado de ${verifier.effort} para ${raised} por risco/efeito.`);

@@ -115,3 +115,9 @@ test("verifier effort is untouched when risk is low and there is no dangerous si
   const decision = route({ category: "critical_review", complexity: "simple" });
   assert.equal(decision.verifier.effort, "medium");
 });
+
+test("an invalid verifier effort floor in the policy fails closed instead of disabling the floor", () => {
+  const broken = structuredClone(policy);
+  broken.guardrails.high_risk_verifier_min_effort = "hgih";
+  assert.throws(() => routeTask({ category: "operational_support", side_effects: "destructive" }, catalog, broken), /high_risk_verifier_min_effort/);
+});
