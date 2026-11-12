@@ -1,0 +1,94 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { loadConfig } from "../src/config.mjs";
+import { routeTask } from "../src/router.mjs";
+
+const { catalog, policy } = await loadConfig();
+const route = (input) => routeTask(input, catalog, policy);
+
+test("operational support defaults to Sonnet 5.5 medium", () => {
+  const decision = route({ category: "operational_support" });
+  assert.equal(decision.primary.model, "claude-sonnet-5-5");
+  assert.equal(decision.primary.effort, "medium");
+  assert.equal(decision.primary.account, "claude_primary");
+});
+
+test("Claude account remains sticky when session account is provided", () => {
+  const decision = route({ category: "operational_support", session_account: "claude_secondary" });
+  assert.equal(decision.primary.account, "claude_secondary");
+});
+
+test("standard coding uses Terra medium", () => {
+  const decision = route({ category: "standard_coding" });
+  assert.equal(decision.primary.model, "gpt-6.1-terra");
+  assert.equal(decision.primary.effort, "medium");
+});
+
+test("mechanical coding uses Luna low", () => {
+  const decision = route({ category: "mechanical_coding" });
+  assert.equal(decision.primary.model, "gpt-6-luna");
+  assert.equal(decision.primary.effort, "low");
+});
+
+test("documentation selects MiniMax in shadow mode with independent verifier", () => {
+  const decision = route({ category: "documentation" });
+  assert.equal(decision.primary.model, "minimax-m2.7");
+  assert.equal(decision.primary.mode, "shadow");
+  assert.equal(decision.verifier.model, "claude-sonnet-5-5");
+  assert.equal(decision.requires_human_approval, true);
+});
+
+test("disabled MiniMax falls back safely", () => {
+  const disabledCatalog = structuredClone(catalog);
+  disabledCatalog.providers.minimax.enabled = false;
+  const decision = routeTask({ category: "documentation" }, disabledCatalog, policy);
+  assert.equal(decision.primary.model, "claude-sonnet-5-5");
+});
+
+test("confidential work never routes to MiniMax or GLM", () => {
+  const decision = route({ category: "documentation", sensitivity: "confidential" });
+  assert.equal(decision.primary.model, "claude-sonnet-5-5");
+  assert.notEqual(decision.primary.provider, "minimax");
+  assert.notEqual(decision.primary.provider, "glm");
+});
+
+test("GLM requires approved API budget", () => {
+  const withoutBudget = route({ category: "long_horizon_engineering" });
+  assert.equal(withoutBudget.primary.model, "claude-sonnet-5-5");
+  const approved = route({ category: "long_horizon_engineering", budget: "approved_api" });
+  assert.equal(approved.primary.model, "glm-5.1");
+  assert.equal(approved.primary.mode, "shadow");
+  assert.equal(approved.verifier.model, "claude-sonnet-5-5");
+});
+
+test("critical or deploy work uses safe controller and independent verifier", () => {
+  const decision = route({ category: "standard_coding", risk: "critical", side_effects: "deploy" });
+  assert.equal(decision.primary.model, "claude-sonnet-5-5");
+  assert.equal(decision.verifier.model, "gpt-6.1-sol");
+  assert.equal(decision.requires_human_approval, true);
+  assert.equal(decision.fail_closed, false);
+});
+
+test("critical review is independent from the author provider", () => {
+  const openAiAuthored = route({ category: "critical_review", author_provider: "openai" });
+  assert.equal(openAiAuthored.primary.provider, "anthropic");
+  assert.equal(openAiAuthored.fail_closed, false);
+  const anthropicAuthored = route({ category: "critical_review", author_provider: "anthropic" });
+  assert.equal(anthropicAuthored.primary.provider, "openai");
+  assert.equal(anthropicAuthored.fail_closed, false);
+});
+
+test("high risk requires human approval", () => {
+  const decision = route({ category: "standard_coding", risk: "high" });
+  assert.equal(decision.requires_human_approval, true);
+  assert.equal(decision.verifier.model, "claude-sonnet-5-5");
+});
+
+test("unavailable provider triggers safe fallback", () => {
+  const decision = route({ category: "standard_coding", unavailable: ["openai"] });
+  assert.equal(decision.primary.model, "claude-sonnet-5-5");
+});
+
+test("invalid category is rejected", () => {
+  assert.throws(() => route({ category: "magic" }), /Invalid category/);
+});

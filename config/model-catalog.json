@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-11-12",
+  "providers": {
+    "anthropic": {
+      "enabled": true,
+      "mode": "active",
+      "adapter": "claude_cli",
+      "response_only": true,
+      "timeout_ms": 300000,
+      "billing": "subscription",
+      "managed_by": "claude_cli",
+      "accounts": [
+        "claude_primary",
+        "claude_secondary"
+      ]
+    },
+    "openai": {
+      "enabled": true,
+      "mode": "active",
+      "adapter": "codex_cli",
+      "response_only": true,
+      "timeout_ms": 300000,
+      "billing": "subscription",
+      "managed_by": "codex_cli",
+      "accounts": [
+        "openai_default"
+      ]
+    },
+    "minimax": {
+      "enabled": true,
+      "mode": "shadow",
+      "adapter": "minimax_anthropic",
+      "response_only": true,
+      "timeout_ms": 300000,
+      "reasoning_token_headroom": 1024,
+      "billing": "token_plan",
+      "cost_tracking": "plan_quota",
+      "managed_by": "model_router",
+      "accounts": [
+        "minimax_default"
+      ],
+      "base_url": "https://api.minimax.io/anthropic",
+      "inference_url": "https://api.minimax.io/anthropic/v1/messages",
+      "allowed_hosts": [
+        "api.minimax.io"
+      ],
+      "health_url": "https://www.minimax.io/v1/token_plan/remains",
+      "secret_ref": "env:MINIMAX_API_KEY"
+    },
+    "glm": {
+      "enabled": true,
+      "mode": "shadow",
+      "adapter": "glm_openai",
+      "response_only": true,
+      "timeout_ms": 300000,
+      "billing": "api_credits",
+      "cost_tracking": "local_usd_estimate",
+      "managed_by": "model_router",
+      "accounts": [
+        "glm_default"
+      ],
+      "base_url": "https://api.z.ai/api/paas/v4",
+      "inference_url": "https://api.z.ai/api/paas/v4/chat/completions",
+      "allowed_hosts": [
+        "api.z.ai"
+      ],
+      "health_url": "https://api.z.ai/api/paas/v4/models",
+      "secret_ref": "env:ZAI_API_KEY",
+      "budget_control": {
+        "currency": "USD",
+        "funded_amount_usd": 10,
+        "tracking_started_at": "2026-01-01T00:00:00Z",
+        "soft_alert_remaining_usd": 5,
+        "critical_alert_remaining_usd": 2,
+        "hard_stop_remaining_usd": 1,
+        "accounting": "local_estimate_only",
+        "reconcile_at": "https://z.ai/manage-apikey/billing",
+        "billing_visibility": "provider balance may lag; billing history is previous-day",
+        "note": "Example values: set funded_amount_usd to the credit you actually loaded and adjust the thresholds."
+      }
+    }
+  },
+  "models": {
+    "claude-sonnet-5": {
+      "provider": "anthropic",
+      "api_model": "claude-sonnet-5",
+      "default_effort": "medium",
+      "roles": [
+        "controller",
+        "worker",
+        "verifier"
+      ],
+      "version_note": "Sonnet 5 — kept as fallback."
+    },
+    "claude-opus-5-5": {
+      "provider": "anthropic",
+      "api_model": "claude-opus-5-5",
+      "default_effort": "medium",
+      "roles": [
+        "controller",
+        "worker",
+        "verifier"
+      ],
+      "version_note": "Opus 5.5 — controller/worker/verifier."
+    },
+    "claude-fable-5-1": {
+      "provider": "anthropic",
+      "api_model": "claude-fable-5-1",
+      "default_effort": "high",
+      "roles": [
+        "controller",
+        "architect",
+        "verifier"
+      ],
+      "version_note": "Fable 5.1 — superseded by Fable 5.2; kept as fallback."
+    },
+    "claude-haiku-4-5": {
+      "provider": "anthropic",
+      "api_model": "claude-haiku-4-5-20251001",
+      "default_effort": "low",
+      "roles": [
+        "worker"
+      ],
+      "version_note": "Haiku 4.5 — superseded by Haiku 5.5; kept in the catalog."
+    },
+    "gpt-5.6-terra": {
+      "provider": "openai",
+      "api_model": "gpt-5.6-terra",
+      "default_effort": "medium",
+      "roles": [
+        "worker",
+        "verifier"
+      ],
+      "version_note": "GPT-5.6 Terra — legacy; kept as fallback."
+    },
+    "gpt-6-luna": {
+      "provider": "openai",
+      "api_model": "gpt-6-luna",
+      "default_effort": "low",
+      "roles": [
+        "worker"
+      ],
+      "version_note": "GPT-6 Luna — fast, low-cost model for mechanical tasks."
+    },
+    "gpt-6-sol": {
+      "provider": "openai",
+      "api_model": "gpt-6-sol",
+      "default_effort": "high",
+      "roles": [
+        "architect",
+        "verifier",
+        "worker"
+      ],
+      "version_note": "GPT-6 Sol — previous-generation workhorse; fallback."
+    },
+    "gpt-6-astra": {
+      "provider": "openai",
+      "api_model": "gpt-6-astra",
+      "default_effort": "high",
+      "roles": [
+        "architect",
+        "worker",
+        "verifier"
+      ],
+      "version_note": "GPT-6 Astra — frontier model for the hardest reasoning work."
+    },
+    "minimax-m2.7": {
+      "provider": "minimax",
+      "api_model": "MiniMax-M2.7",
+      "default_effort": "medium",
+      "roles": [
+        "worker"
+      ],
+      "version_note": "MiniMax M2.7 — optional, shadow mode (needs MINIMAX_API_KEY)."
+    },
+    "glm-5.1": {
+      "provider": "glm",
+      "api_model": "glm-5.1",
+      "default_effort": "medium",
+      "roles": [
+        "worker",
+        "long_horizon"
+      ],
+      "context_window_tokens": 200000,
+      "max_output_tokens": 128000,
+      "pricing_usd_per_million_tokens": {
+        "input": 1.4,
+        "cached_input": 0.26,
+        "output": 4.4
+      },
+      "pricing_source": "https://docs.z.ai/guides/overview/pricing",
+      "pricing_checked_at": "2026-08-01",
+      "version_note": "GLM 5.1 — optional, shadow mode with hard budget stop (needs ZAI_API_KEY)."
+    },
+    "claude-fable-5-2": {
+      "provider": "anthropic",
+      "api_model": "claude-fable-5-2",
+      "default_effort": "high",
+      "roles": [
+        "controller",
+        "architect",
+        "verifier"
+      ],
+      "version_note": "Fable 5.2 — top-tier reasoning; primary for executive_synthesis."
+    },
+    "claude-sonnet-5-5": {
+      "provider": "anthropic",
+      "api_model": "claude-sonnet-5-5",
+      "default_effort": "high",
+      "roles": [
+        "controller",
+        "worker",
+        "verifier"
+      ],
+      "version_note": "Sonnet 5.5 — default controller/worker/verifier in this template."
+    },
+    "claude-haiku-5-5": {
+      "provider": "anthropic",
+      "api_model": "claude-haiku-5-5",
+      "default_effort": "medium",
+      "roles": [
+        "worker"
+      ],
+      "version_note": "Haiku 5.5 — low-cost worker."
+    },
+    "gpt-6.1-sol": {
+      "provider": "openai",
+      "api_model": "gpt-6.1-sol",
+      "default_effort": "medium",
+      "roles": [
+        "architect",
+        "verifier",
+        "worker"
+      ],
+      "version_note": "GPT-6.1 Sol — primary/verifier for critical review and comparative analysis."
+    },
+    "gpt-6.1-terra": {
+      "provider": "openai",
+      "api_model": "gpt-6.1-terra",
+      "default_effort": "medium",
+      "roles": [
+        "worker",
+        "verifier"
+      ],
+      "version_note": "GPT-6.1 Terra — default coding worker. Requires Codex CLI >= 0.159.0."
+    }
+  }
+}

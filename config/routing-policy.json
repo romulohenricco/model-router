@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-11-12",
+  "defaults": {
+    "category": "operational_support",
+    "risk": "medium",
+    "sensitivity": "internal",
+    "side_effects": "none",
+    "complexity": "medium",
+    "latency": "interactive",
+    "budget": "subscription",
+    "controller": "claude-sonnet-5-5",
+    "coding": "gpt-6.1-terra"
+  },
+  "routes": {
+    "deep_reasoning": {
+      "primary": "gpt-6-astra",
+      "fallbacks": [
+        "gpt-6.1-sol",
+        "gpt-6-sol",
+        "claude-opus-5-5",
+        "claude-sonnet-5-5",
+        "claude-sonnet-5",
+        "gpt-6.1-terra"
+      ],
+      "verifiers": [
+        "claude-sonnet-5-5",
+        "gpt-6.1-sol",
+        "claude-opus-5-5"
+      ],
+      "effort_by_complexity": {
+        "simple": "medium",
+        "medium": "high",
+        "complex": "xhigh"
+      }
+    },
+    "mechanical_coding": {
+      "primary": "gpt-6-luna",
+      "fallbacks": [
+        "gpt-6.1-terra",
+        "minimax-m2.7",
+        "claude-sonnet-5-5",
+        "claude-sonnet-5",
+        "claude-haiku-5-5"
+      ],
+      "verifiers": [
+        "gpt-6.1-terra",
+        "claude-sonnet-5-5"
+      ],
+      "effort_by_complexity": {
+        "simple": "low",
+        "medium": "low",
+        "complex": "medium"
+      }
+    },
+    "critical_review": {
+      "primary": "gpt-6.1-sol",
+      "fallbacks": [
+        "gpt-6-sol",
+        "claude-sonnet-5-5",
+        "claude-sonnet-5",
+        "claude-opus-5-5"
+      ],
+      "verifiers": [
+        "claude-sonnet-5-5",
+        "gpt-6.1-sol"
+      ],
+      "effort_by_complexity": {
+        "simple": "medium",
+        "medium": "high",
+        "complex": "high"
+      }
+    },
+    "research": {
+      "primary": "claude-sonnet-5-5",
+      "fallbacks": [
+        "claude-sonnet-5",
+        "gpt-6.1-sol",
+        "gpt-6-sol",
+        "glm-5.1",
+        "gpt-6-luna"
+      ],
+      "verifiers": [
+        "gpt-6.1-sol",
+        "claude-sonnet-5-5"
+      ],
+      "effort_by_complexity": {
+        "simple": "low",
+        "medium": "medium",
+        "complex": "high"
+      }
+    },
+    "executive_synthesis": {
+      "primary": "claude-fable-5-2",
+      "fallbacks": [
+        "claude-opus-5-5",
+        "claude-fable-5-1",
+        "claude-sonnet-5-5",
+        "claude-sonnet-5",
+        "gpt-6.1-sol",
+        "gpt-6-sol",
+        "gpt-6.1-terra"
+      ],
+      "verifiers": [
+        "claude-sonnet-5-5",
+        "gpt-6.1-sol",
+        "claude-opus-5-5"
+      ],
+      "effort_by_complexity": {
+        "simple": "medium",
+        "medium": "high",
+        "complex": "max"
+      }
+    },
+    "documentation": {
+      "primary": "minimax-m2.7",
+      "fallbacks": [
+        "claude-sonnet-5-5",
+        "claude-sonnet-5",
+        "claude-haiku-5-5",
+        "gpt-6.1-terra"
+      ],
+      "verifiers": [
+        "claude-sonnet-5-5",
+        "gpt-6.1-sol"
+      ],
+      "effort_by_complexity": {
+        "simple": "low",
+        "medium": "medium",
+        "complex": "medium"
+      }
+    },
+    "comparative_analysis": {
+      "primary": "gpt-6.1-sol",
+      "fallbacks": [
+        "gpt-6-sol",
+        "claude-sonnet-5-5",
+        "claude-sonnet-5",
+        "glm-5.1",
+        "claude-opus-5-5"
+      ],
+      "verifiers": [
+        "claude-sonnet-5-5",
+        "gpt-6.1-sol",
+        "claude-opus-5-5"
+      ],
+      "effort_by_complexity": {
+        "simple": "medium",
+        "medium": "high",
+        "complex": "high"
+      }
+    },
+    "operational_support": {
+      "primary": "claude-sonnet-5-5",
+      "fallbacks": [
+        "claude-sonnet-5",
+        "gpt-6.1-terra",
+        "gpt-6-luna",
+        "claude-opus-5-5"
+      ],
+      "verifiers": [
+        "gpt-6.1-sol",
+        "claude-sonnet-5-5"
+      ],
+      "effort_by_complexity": {
+        "simple": "low",
+        "medium": "medium",
+        "complex": "medium"
+      }
+    },
+    "long_horizon_engineering": {
+      "primary": "glm-5.1",
+      "fallbacks": [
+        "claude-sonnet-5-5",
+        "claude-sonnet-5",
+        "gpt-6.1-sol",
+        "gpt-6-sol",
+        "gpt-6-astra",
+        "claude-fable-5-1",
+        "claude-opus-5-5"
+      ],
+      "verifiers": [
+        "claude-sonnet-5-5",
+        "gpt-6.1-sol"
+      ],
+      "effort_by_complexity": {
+        "simple": "medium",
+        "medium": "high",
+        "complex": "xhigh"
+      }
+    },
+    "standard_coding": {
+      "primary": "gpt-6.1-terra",
+      "fallbacks": [
+        "claude-sonnet-5-5",
+        "claude-sonnet-5",
+        "gpt-6.1-sol",
+        "gpt-6-sol",
+        "claude-opus-5-5"
+      ],
+      "verifiers": [
+        "claude-sonnet-5-5",
+        "gpt-6.1-sol"
+      ],
+      "effort_by_complexity": {
+        "simple": "low",
+        "medium": "medium",
+        "complex": "xhigh"
+      }
+    }
+  },
+  "guardrails": {
+    "external_sensitive_providers": [
+      "minimax",
+      "glm"
+    ],
+    "sensitive_levels": [
+      "confidential",
+      "restricted"
+    ],
+    "api_budget_providers": [
+      "glm"
+    ],
+    "dangerous_side_effects": [
+      "deploy",
+      "destructive"
+    ],
+    "high_risks": [
+      "high",
+      "critical"
+    ],
+    "safe_controller": "claude-sonnet-5-5",
+    "critical_verifier": "gpt-6.1-sol"
+  }
+}

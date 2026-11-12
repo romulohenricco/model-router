@@ -1,0 +1,28 @@
+{
+  "name": "model-router",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Deterministic, auditable model/provider router with response-only dispatch, fallbacks and independent verification.",
+  "scripts": {
+    "check": "node src/cli.mjs check",
+    "budget": "node src/cli.mjs budget",
+    "doctor": "node src/cli.mjs doctor",
+    "dispatch": "node src/cli.mjs dispatch",
+    "route": "node src/cli.mjs route",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "license": "MIT",
+  "bin": {
+    "model-router": "src/cli.mjs"
+  },
+  "files": [
+    "src",
+    "config",
+    "schemas",
+    "README.md"
+  ],
+  "private": true
+}

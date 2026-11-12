@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/model-router/route-decision.schema.json",
+  "title": "Model routing decision",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "decision_id",
+    "category",
+    "primary",
+    "fallbacks",
+    "verifier",
+    "requires_human_approval",
+    "fail_closed",
+    "reasons"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "decision_id": { "type": "string" },
+    "category": { "type": "string" },
+    "primary": { "$ref": "#/$defs/selection" },
+    "fallbacks": { "type": "array", "items": { "$ref": "#/$defs/selection" } },
+    "verifier": { "anyOf": [{ "$ref": "#/$defs/selection" }, { "type": "null" }] },
+    "requires_human_approval": { "type": "boolean" },
+    "fail_closed": { "type": "boolean" },
+    "reasons": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "selection": {
+      "type": "object",
+      "required": ["provider", "model", "api_model", "account", "effort", "mode"],
+      "properties": {
+        "provider": { "type": "string" },
+        "model": { "type": "string" },
+        "api_model": { "type": "string" },
+        "account": { "type": "string" },
+        "effort": { "type": "string" },
+        "mode": { "enum": ["active", "shadow"] }
+      }
+    }
+  }
+}

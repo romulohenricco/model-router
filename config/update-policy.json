@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "auto": true,
+  "interval_hours": 24,
+  "apply": "direct_successors",
+  "smoke_before_apply": true,
+  "timeout_ms": 15000,
+  "lines": {
+    "anthropic": ["fable", "opus", "sonnet", "haiku"],
+    "openai": ["astra", "sol", "terra", "luna"]
+  },
+  "sources": {
+    "anthropic": [
+      { "type": "anthropic_docs_md", "url": "https://platform.claude.com/docs/en/about-claude/models/overview.md" }
+    ],
+    "openai": [
+      { "type": "codex_models_cache" },
+      { "type": "openai_docs_md", "url": "https://developers.openai.com/api/docs/models.md" }
+    ]
+  },
+  "allowed_hosts": ["platform.claude.com", "developers.openai.com"]
+}
