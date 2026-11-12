@@ -2,7 +2,8 @@
 // provider docs, plans direct-successor swaps and (optionally) applies them after
 // a live smoke test. Never sends prompts, secrets or user data anywhere.
 import { mkdir, open, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -279,6 +280,36 @@ export async function acknowledgeUpdates(logRoot = defaultLogRoot()) {
   return state;
 }
 
+// ---------- after an automatic apply ----------
+
+/**
+ * Optional follow-up after the config was rewritten:
+ *  - auto_commit: commit ONLY the two config files locally (never push); a
+ *    post-commit hook, when installed, then propagates the change.
+ *  - otherwise, if scripts/propagate.mjs exists, start it detached.
+ */
+export function afterApply(root, updatePolicy, changes) {
+  const files = ["config/model-catalog.json", "config/routing-policy.json"];
+  const summary = changes.map((c) => `${c.from} -> ${c.to}`).join(", ");
+  const result = { committed: false, propagate: "not_installed" };
+  if (updatePolicy.auto_commit) {
+    const res = spawnSync("git", ["commit", "-m", `chore(models): auto-update ${summary}`, "--", ...files], {
+      cwd: root, encoding: "utf8", windowsHide: true, env: { ...process.env, MODEL_ROUTER_AUTO_UPDATE: "0" }
+    });
+    result.committed = res.status === 0;
+  }
+  // Propagation is idempotent and coalesced, so it is safe even if a git hook also fires.
+  const propagate = path.join(root, "scripts", "propagate.mjs");
+  if (existsSync(propagate)) {
+    const child = spawn(process.execPath, [propagate, "--apply", "--reason", `auto-update ${summary}`], {
+      cwd: root, detached: true, stdio: "ignore", windowsHide: true, env: { ...process.env, MODEL_ROUTER_AUTO_UPDATE: "0" }
+    });
+    child.unref();
+    result.propagate = "spawned";
+  }
+  return result;
+}
+
 // ---------- main entry ----------
 
 export async function runUpdate({
@@ -369,6 +400,7 @@ export async function runUpdate({
       sources_failed: sources.filter((s) => !s.ok).length
     });
     await writeJsonAtomic(path.join(dir, `${date}.json`), report);
+    if (changes.length) report.followup = afterApply(root, updatePolicy, changes);
     return report;
   });
 }

@@ -92,3 +92,26 @@ test("unavailable provider triggers safe fallback", () => {
 test("invalid category is rejected", () => {
   assert.throws(() => route({ category: "magic" }), /Invalid category/);
 });
+
+test("verifier effort never drops below high on high risk or dangerous side effects", () => {
+  for (const input of [
+    { category: "operational_support", side_effects: "destructive" },
+    { category: "operational_support", side_effects: "deploy" },
+    { category: "documentation", risk: "critical", complexity: "simple" },
+    { category: "standard_coding", risk: "high", complexity: "simple" }
+  ]) {
+    const decision = route(input);
+    assert.ok(decision.verifier, `verifier expected for ${JSON.stringify(input)}`);
+    assert.ok(["high", "xhigh", "max"].includes(decision.verifier.effort), `${JSON.stringify(input)} -> ${decision.verifier.effort}`);
+  }
+});
+
+test("verifier effort floor does not lower efforts already above high", () => {
+  const decision = route({ category: "deep_reasoning", risk: "high", complexity: "complex" });
+  assert.equal(decision.verifier.effort, "xhigh");
+});
+
+test("verifier effort is untouched when risk is low and there is no dangerous side effect", () => {
+  const decision = route({ category: "critical_review", complexity: "simple" });
+  assert.equal(decision.verifier.effort, "medium");
+});

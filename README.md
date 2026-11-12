@@ -61,7 +61,7 @@ node src/cli.mjs update                # aplica sucessores diretos (com smoke)
 node src/cli.mjs update-status [--ack] # estado da última checagem / dispensar aviso
 ```
 
-Configuração em `config/update-policy.json` (`auto`, `interval_hours`, `apply: "direct_successors" | "recommend_only"`, `smoke_before_apply`, fontes e linhas). Para desligar numa máquina: `MODEL_ROUTER_AUTO_UPDATE=0` (em CI já vem desligado).
+Configuração em `config/update-policy.json` (`auto`, `interval_hours`, `apply: "direct_successors" | "recommend_only"`, `smoke_before_apply`, `auto_commit`, fontes e linhas). Com `recommend_only`, a checagem diária só avisa; rodar `update` à mão aplica (sempre com o smoke). Com `auto_commit: true`, cada troca automática vira um commit local só dos dois arquivos de config (nunca faz push). Para desligar numa máquina: `MODEL_ROUTER_AUTO_UPDATE=0` (em CI já vem desligado).
 
 ## Requisitos
 

@@ -8,6 +8,7 @@ import { logDecision } from "./telemetry.mjs";
 import { getProviderBudget } from "./budget.mjs";
 import { acknowledgeUpdates, isUpdateDue, loadUpdatePolicy, pendingNotice, readUpdateState, runUpdate, spawnBackgroundUpdate } from "./updates.mjs";
 import { fileURLToPath } from "node:url";
+import { existsSync } from "node:fs";
 
 const KNOWN_FLAGS = new Set([
   "category", "risk", "sensitivity", "side_effects", "complexity", "latency", "budget", "author_provider",
@@ -32,6 +33,14 @@ Commands:
 Decision flags: --category --risk --sensitivity --side-effects --complexity --latency
                 --budget --author-provider --unavailable a,b --session-account --log
 Dispatch flags: --approve-shadow --approve --max-output-tokens N --timeout-ms N --no-fallback --quiet`;
+
+// Consumers of this router are kept in sync by scripts/propagate.mjs (when installed).
+async function propagationNoticeIfInstalled() {
+  const script = new URL("../scripts/propagate.mjs", import.meta.url);
+  if (!existsSync(fileURLToPath(script))) return null;
+  const { propagationNotice } = await import(script.href);
+  return propagationNotice();
+}
 
 function parseArgs(argv) {
   const [command = "route", ...rest] = argv;
@@ -95,11 +104,14 @@ async function main() {
       if (await isUpdateDue(updatePolicy)) spawnBackgroundUpdate(fileURLToPath(import.meta.url));
       const notice = await pendingNotice();
       if (notice && !flags.quiet) console.error(notice);
+      const propagation = await propagationNoticeIfInstalled();
+      if (propagation && !flags.quiet) console.error(propagation);
     } catch { /* update checks never block routing */ }
   }
 
   if (command === "check") {
-    console.log(JSON.stringify({ ok: true, schema_version: 1, providers: Object.keys(catalog.providers).length, models: Object.keys(catalog.models).length, routes: Object.keys(policy.routes).length }, null, 2));
+    const propagation = await propagationNoticeIfInstalled().catch(() => null);
+    console.log(JSON.stringify({ ok: true, schema_version: 1, providers: Object.keys(catalog.providers).length, models: Object.keys(catalog.models).length, routes: Object.keys(policy.routes).length, ...(propagation ? { propagation_warning: propagation } : {}) }, null, 2));
     return;
   }
   if (command === "catalog") {

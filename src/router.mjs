@@ -34,6 +34,15 @@ function resolveEffort(route, input, model) {
   return route.effort_by_complexity?.[input.complexity] ?? model.default_effort;
 }
 
+const EFFORT_ORDER = ["low", "medium", "high", "xhigh", "max"];
+
+// Verification of high/critical risk or deploy/destructive side effects never runs
+// below this effort floor, even when the route's effort_by_complexity would give less.
+// Override with policy.guardrails.high_risk_verifier_min_effort.
+function atLeast(effort, floor) {
+  return EFFORT_ORDER.indexOf(effort) >= EFFORT_ORDER.indexOf(floor) ? effort : floor;
+}
+
 function selection(modelId, catalog, input, route) {
   const model = catalog.models[modelId];
   const provider = catalog.providers[model.provider];
@@ -133,6 +142,14 @@ export function routeTask(rawInput, catalog, policy) {
       );
     }
     verifier = verifierId ? selection(verifierId, catalog, input, route) : null;
+    if (verifier && (highRisk || dangerous)) {
+      const floor = policy.guardrails.high_risk_verifier_min_effort ?? "high";
+      const raised = atLeast(verifier.effort, floor);
+      if (raised !== verifier.effort) {
+        reasons.push(`Esforço do verificador elevado de ${verifier.effort} para ${raised} por risco/efeito.`);
+        verifier.effort = raised;
+      }
+    }
     reasons.push(verifier ? `Verificação independente por ${verifier.model}.` : "Verificador independente indisponível; falhar fechado.");
   }
 
