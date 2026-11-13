@@ -96,9 +96,12 @@ export function routeTask(rawInput, catalog, policy) {
   const dangerous = policy.guardrails.dangerous_side_effects.includes(input.side_effects);
   const highRisk = policy.guardrails.high_risks.includes(input.risk);
   const reasons = [];
-  let candidates = [route.primary, ...route.fallbacks];
+  // Sensitive data may use a different (e.g. non-economical) fallback chain.
+  const routeFallbacks = route.fallbacks_by_sensitivity?.[input.sensitivity] ?? route.fallbacks;
+  let candidates = [route.primary, ...routeFallbacks];
+  const critical = dangerous || input.risk === "critical";
 
-  if (dangerous || input.risk === "critical") {
+  if (critical) {
     candidates = [policy.guardrails.safe_controller, ...candidates];
     reasons.push("Ação crítica usa o controlador seguro e exige aprovação humana.");
   }
@@ -121,6 +124,15 @@ export function routeTask(rawInput, catalog, policy) {
   const fallbackIds = [...new Set(candidates)]
     .filter((id) => id !== primaryId && isAllowed(id, catalog, policy, input));
   const fallbacks = fallbackIds.map((id) => selection(id, catalog, input, route));
+  // Critical or deploy/destructive work never runs the executing model below this
+  // effort floor, even when effort_by_complexity would give less (e.g. complexity simple).
+  if (critical) {
+    const floor = policy.guardrails.critical_primary_min_effort ?? "high";
+    if (!EFFORT_ORDER.includes(floor)) throw new Error(`Invalid guardrails.critical_primary_min_effort: ${floor}`);
+    const before = primary.effort;
+    for (const s of [primary, ...fallbacks]) s.effort = atLeast(s.effort, floor);
+    if (primary.effort !== before) reasons.push(`Esforço do primário elevado de ${before} para ${primary.effort} por ação crítica.`);
+  }
 
   const shadow = primary.mode === "shadow";
   const independentReviewSatisfied = reviewCategory
@@ -131,7 +143,11 @@ export function routeTask(rawInput, catalog, policy) {
   if (verifierNeeded) {
     const excluded = new Set([primary.provider]);
     if (input.author_provider) excluded.add(input.author_provider);
-    let verifierId = firstAllowed(route.verifiers, catalog, policy, input, excluded);
+    // Critical or deploy/destructive work is verified by the critical verifier first.
+    const verifierCandidates = critical
+      ? [policy.guardrails.critical_verifier, ...route.verifiers, policy.guardrails.safe_controller]
+      : route.verifiers;
+    let verifierId = firstAllowed(verifierCandidates, catalog, policy, input, excluded);
     if (!verifierId) {
       verifierId = firstAllowed(
         [policy.guardrails.critical_verifier, policy.guardrails.safe_controller],

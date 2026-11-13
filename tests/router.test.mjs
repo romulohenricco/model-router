@@ -47,7 +47,8 @@ test("disabled MiniMax falls back safely", () => {
 
 test("confidential work never routes to MiniMax or GLM", () => {
   const decision = route({ category: "documentation", sensitivity: "confidential" });
-  assert.equal(decision.primary.model, "gpt-6-luna");
+  // confidential documentation keeps the non-economical chain (fallbacks_by_sensitivity)
+  assert.equal(decision.primary.model, "claude-sonnet-5-5");
   assert.notEqual(decision.primary.provider, "minimax");
   assert.notEqual(decision.primary.provider, "glm");
 });
@@ -120,4 +121,25 @@ test("an invalid verifier effort floor in the policy fails closed instead of dis
   const broken = structuredClone(policy);
   broken.guardrails.high_risk_verifier_min_effort = "hgih";
   assert.throws(() => routeTask({ category: "operational_support", side_effects: "destructive" }, catalog, broken), /high_risk_verifier_min_effort/);
+});
+
+test("critical or destructive work runs the primary and fallbacks at least at high effort", () => {
+  for (const input of [
+    { category: "documentation", risk: "critical", complexity: "simple" },
+    { category: "mechanical_coding", side_effects: "destructive", complexity: "simple" },
+    { category: "operational_support", side_effects: "deploy", complexity: "simple" }
+  ]) {
+    const decision = route(input);
+    for (const s of [decision.primary, ...decision.fallbacks]) {
+      assert.ok(["high", "xhigh", "max"].includes(s.effort), `${JSON.stringify(input)} ${s.model} -> ${s.effort}`);
+    }
+  }
+  assert.equal(route({ category: "documentation", complexity: "simple", unavailable: ["minimax"] }).primary.effort, "low", "non-critical work keeps its effort");
+});
+
+test("critical or destructive work is verified by the critical verifier first", () => {
+  const decision = route({ category: "mechanical_coding", side_effects: "destructive" });
+  assert.equal(decision.verifier.model, policy.guardrails.critical_verifier);
+  const highOnly = route({ category: "mechanical_coding", risk: "high" });
+  assert.ok(highOnly.verifier, "high risk still verified");
 });

@@ -129,6 +129,20 @@
         "simple": "low",
         "medium": "medium",
         "complex": "medium"
+      },
+      "fallbacks_by_sensitivity": {
+        "confidential": [
+          "claude-sonnet-5-5",
+          "claude-sonnet-5",
+          "claude-haiku-5-5",
+          "gpt-6.1-terra"
+        ],
+        "restricted": [
+          "claude-sonnet-5-5",
+          "claude-sonnet-5",
+          "claude-haiku-5-5",
+          "gpt-6.1-terra"
+        ]
       }
     },
     "comparative_analysis": {
@@ -231,6 +245,7 @@
       "critical"
     ],
     "safe_controller": "claude-sonnet-5-5",
-    "critical_verifier": "gpt-6.1-sol"
+    "critical_verifier": "gpt-6.1-sol",
+    "critical_primary_min_effort": "high"
   }
 }

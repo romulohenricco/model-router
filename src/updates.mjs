@@ -191,6 +191,13 @@ export function applyPlan(catalog, policy, plan, { date }) {
         slots.push(`${category}.verifiers`);
       }
       route.fallbacks = [...new Set(route.fallbacks)].filter((m) => m !== route.primary);
+      for (const [level, list] of Object.entries(route.fallbacks_by_sensitivity ?? {})) {
+        const i = list.indexOf(u.from);
+        if (i >= 0 && !list.includes(u.to)) {
+          list.splice(i, 0, u.to);
+          slots.push(`${category}.fallbacks_by_sensitivity.${level}`);
+        }
+      }
     }
     for (const [section, key] of SLOT_PATHS) {
       if (nextPolicy[section]?.[key] === u.from) {

@@ -36,7 +36,7 @@ export function validateConfig(catalog, policy) {
   }
   const VALID_EFFORTS = new Set(["low", "medium", "high", "xhigh", "max"]);
   for (const [category, route] of Object.entries(policy.routes ?? {})) {
-    for (const modelId of [route.primary, ...(route.fallbacks ?? []), ...(route.verifiers ?? [])]) {
+    for (const modelId of [route.primary, ...(route.fallbacks ?? []), ...(route.verifiers ?? []), ...Object.values(route.fallbacks_by_sensitivity ?? {}).flat()]) {
       if (!catalog.models?.[modelId]) {
         throw new Error(`Route ${category} references unknown model ${modelId}`);
       }
