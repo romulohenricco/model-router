@@ -39,6 +39,12 @@ export function parseModelId(id, lines = {}) {
   if (m && (lines.openai ?? []).includes(m[3])) {
     return { provider: "openai", line: m[3], version: [Number(m[1]), Number(m[2] ?? 0)] };
   }
+  // Google: gemini-<major>[.<minor>]-<line>. Variants with any extra suffix
+  // (-lite, -tts, -image, -live, -preview, dated snapshots...) are not successors.
+  m = /^gemini-(\d+)(?:\.(\d+))?-([a-z]+)$/.exec(id);
+  if (m && (lines.google ?? []).includes(m[3])) {
+    return { provider: "google", line: m[3], version: [Number(m[1]), Number(m[2] ?? 0)] };
+  }
   return null;
 }
 
@@ -74,6 +80,13 @@ export function extractOpenAIIds(text) {
   return [...new Set([...text.matchAll(/\b(gpt-\d+(?:\.\d+)?-[a-z]+)\b/g)].map((x) => x[1]))];
 }
 
+export function extractGoogleIds(markdown) {
+  // Only model codes the page presents as such: `inline code` or **bold**.
+  // Anchors ({% id="gemini-25-flash" %}) and URLs are ignored on purpose.
+  const ids = [...markdown.matchAll(/(?:`|\*\*)(gemini-[a-z0-9][a-z0-9.-]*[a-z0-9])(?:`|\*\*)/g)].map((x) => x[1]);
+  return [...new Set(ids)];
+}
+
 export function extractCodexCacheIds(json) {
   const models = Array.isArray(json) ? json : json.models ?? [];
   return models.filter((m) => m.slug && (m.visibility ?? "list") === "list").map((m) => m.slug);
@@ -85,6 +98,8 @@ async function readSource(source, ctx) {
       return extractAnthropicIds(await fetchText(source.url, ctx));
     case "openai_docs_md":
       return extractOpenAIIds(await fetchText(source.url, ctx));
+    case "google_docs_md":
+      return extractGoogleIds(await fetchText(source.url, ctx));
     case "codex_models_cache": {
       const home = process.env.CODEX_HOME ?? path.join(os.homedir(), ".codex");
       return extractCodexCacheIds(JSON.parse(await readFile(path.join(home, "models_cache.json"), "utf8")));

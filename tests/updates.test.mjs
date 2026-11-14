@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { loadConfig } from "../src/config.mjs";
 import {
-  applyPlan, extractAnthropicIds, extractCodexCacheIds, extractOpenAIIds, isUpdateDue,
+  applyPlan, extractAnthropicIds, extractCodexCacheIds, extractGoogleIds, extractOpenAIIds, isUpdateDue,
   loadUpdatePolicy, parseModelId, pendingNotice, planUpdates, runUpdate
 } from "../src/updates.mjs";
 
@@ -26,6 +26,48 @@ test("source extractors read the documented formats", () => {
   assert.deepEqual(extractAnthropicIds(md), ["claude-fable-5-2", "claude-opus-5-5"]);
   assert.deepEqual(extractOpenAIIds("use gpt-6-astra or gpt-6.1-sol"), ["gpt-6-astra", "gpt-6.1-sol"]);
   assert.deepEqual(extractCodexCacheIds({ models: [{ slug: "gpt-6.1-sol", visibility: "list" }, { slug: "x", visibility: "hide" }] }), ["gpt-6.1-sol"]);
+});
+
+test("Google Gemini ids parse by line and reject variant suffixes", () => {
+  assert.deepEqual(parseModelId("gemini-4-argon", lines), { provider: "google", line: "argon", version: [4, 0] });
+  assert.deepEqual(parseModelId("gemini-3.8-flash", lines), { provider: "google", line: "flash", version: [3, 8] });
+  assert.deepEqual(parseModelId("gemini-2.5-pro", lines), { provider: "google", line: "pro", version: [2, 5] });
+  assert.deepEqual(parseModelId("gemini-4-carbon", lines), { provider: "google", line: "carbon", version: [4, 0] });
+  for (const id of [
+    "gemini-2.5-flash-lite", "gemini-3.8-flash-tts", "gemini-3.1-flash-image", "gemini-3.8-live",
+    "gemini-3.1-pro-preview", "gemini-2.5-flash-preview-09-2025", "gemini-embedding-001", "gemini-flash-latest", "gemini-3.5-transcribe"
+  ]) assert.equal(parseModelId(id, lines), null, id);
+  assert.equal(parseModelId("gemini-4-argon", { ...lines, google: [] }), null);
+});
+
+test("Google docs extractor reads model codes, not anchors or links", () => {
+  const md = [
+    "  *   *Model code* **gemini-4-carbon**",
+    "  {% button href=\"/docs/models/gemini-9-flash\" %}",
+    "## Gemini 2.5 Flash  {% id=\"gemini-25-flash\" %}",
+    "  * `gemini-3.8-flash`",
+    "  * `gemini-3.8-flash-tts`",
+    "  [`gemini-3.8-flash`](/docs/models/gemini-3.8-flash) and `gemini-2.5-flash-lite`."
+  ].join("\n");
+  assert.deepEqual(extractGoogleIds(md), ["gemini-4-carbon", "gemini-3.8-flash", "gemini-3.8-flash-tts", "gemini-2.5-flash-lite"]);
+});
+
+test("Gemini: a newer flash is a direct successor and a new line is only recommended", () => {
+  const plan = planUpdates(catalog, {
+    google: ["gemini-4-carbon", "gemini-4-argon", "gemini-4-hydrogen", "gemini-3.8-flash", "gemini-3.8-flash-tts", "gemini-3.1-pro-preview", "gemini-2.5-pro"]
+  }, updatePolicy);
+  assert.deepEqual(plan.updates.map((u) => [u.from, u.to, u.action]), [["gemini-2.5-flash", "gemini-3.8-flash", "replace"]]);
+  assert.deepEqual(plan.new_lines.map((n) => [n.model, n.action]), [["gemini-4-carbon", "recommend_only"]]);
+  const { catalog: c, policy: p } = applyPlan(catalog, policy, plan, { date: "2030-01-01" });
+  assert.equal(c.models["gemini-3.8-flash"].provider, "google");
+  assert.ok(!c.models["gemini-4-carbon"]);
+  assert.ok(Object.values(p.routes).some((r) => r.fallbacks.includes("gemini-3.8-flash")));
+  assert.ok(p.guardrails.external_sensitive_providers.includes("google"));
+});
+
+test("update policy allowlists the Google models page", () => {
+  assert.deepEqual(updatePolicy.sources.google, [{ type: "google_docs_md", url: "https://ai.google.dev/gemini-api/docs/models.md" }]);
+  assert.ok(updatePolicy.allowed_hosts.includes("ai.google.dev"));
 });
 
 test("current catalog is up to date against the same ids", () => {

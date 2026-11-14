@@ -17,6 +17,13 @@
       "sol",
       "terra",
       "luna"
+    ],
+    "google": [
+      "carbon",
+      "argon",
+      "hydrogen",
+      "pro",
+      "flash"
     ]
   },
   "sources": {
@@ -34,11 +41,18 @@
         "type": "openai_docs_md",
         "url": "https://developers.openai.com/api/docs/models.md"
       }
+    ],
+    "google": [
+      {
+        "type": "google_docs_md",
+        "url": "https://ai.google.dev/gemini-api/docs/models.md"
+      }
     ]
   },
   "allowed_hosts": [
     "platform.claude.com",
-    "developers.openai.com"
+    "developers.openai.com",
+    "ai.google.dev"
   ],
   "auto_commit": false
 }
