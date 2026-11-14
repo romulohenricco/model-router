@@ -11,6 +11,7 @@ import readline from "node:readline/promises";
 import { fileURLToPath } from "node:url";
 import { validateConfig } from "./config.mjs";
 import { routeTask } from "./router.mjs";
+import { resolveCliCommand } from "./adapters/common.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -21,6 +22,20 @@ export function detectTool(command) {
   // command is one of our fixed tool names, never user input
   const version = spawnSync(`${command} --version`, { encoding: "utf8", windowsHide: true, shell: true, timeout: 15_000 });
   return { installed: true, version: (version.stdout || "").trim().split("\n")[0] || null };
+}
+
+// Honors MODEL_ROUTER_CLAUDE_BIN / MODEL_ROUTER_CODEX_BIN: a configured
+// executable is probed directly (no shell); an invalid one is reported, not run.
+export function detectCli(name) {
+  let command;
+  try {
+    command = resolveCliCommand(name);
+  } catch (error) {
+    return { installed: false, error_code: error.code };
+  }
+  if (command === name) return detectTool(name);
+  const version = spawnSync(command, ["--version"], { encoding: "utf8", windowsHide: true, timeout: 15_000 });
+  return { installed: true, path: command, version: (version.stdout || "").trim().split(/\r?\n/)[0] || null };
 }
 
 export function detectEnvironment() {

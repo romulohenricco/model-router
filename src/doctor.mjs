@@ -1,11 +1,12 @@
 import { runProcess } from "./process.mjs";
+import { resolveCliCommand } from "./adapters/common.mjs";
 import { readSecret } from "./secrets.mjs";
 
 async function probe(providerId, provider, expectedModels) {
   if (provider.adapter === "claude_cli") {
     try {
       const result = await runProcess({
-        command: "claude",
+        command: resolveCliCommand("claude"),
         args: ["auth", "status", "--json"],
         input: "",
         timeoutMs: 30_000,
@@ -29,7 +30,7 @@ async function probe(providerId, provider, expectedModels) {
   if (provider.adapter === "codex_cli") {
     try {
       const result = await runProcess({
-        command: "codex",
+        command: resolveCliCommand("codex"),
         args: ["login", "status"],
         input: "",
         timeoutMs: 30_000,

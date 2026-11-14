@@ -3,7 +3,7 @@ import path from "node:path";
 import { access, readdir, realpath } from "node:fs/promises";
 import { RouterError } from "../errors.mjs";
 import { runProcess } from "../process.mjs";
-import { normalizeUsage, RESPONSE_ONLY_SYSTEM, sanitizeEnvironment } from "./common.mjs";
+import { normalizeUsage, resolveCliCommand, RESPONSE_ONLY_SYSTEM, sanitizeEnvironment } from "./common.mjs";
 
 const ALLOWED_ITEM_TYPES = new Set(["agent_message", "reasoning", "error", "plan", "todo_list"]);
 
@@ -94,6 +94,7 @@ export async function invokeOpenAI({
   systemPrompt = RESPONSE_ONLY_SYSTEM,
   run = runProcess
 }) {
+  const command = resolveCliCommand("codex");
   const env = sanitizeEnvironment([
     "OPENAI_API_KEY",
     "OPENAI_BASE_URL",
@@ -104,7 +105,7 @@ export async function invokeOpenAI({
   const skillConfig = await disabledSkillsConfig();
   const responsePrompt = `${systemPrompt}\n\nREQUEST:\n${prompt}`;
   const result = await run({
-    command: "codex",
+    command,
     args: [
       "exec", "-",
       "--json",

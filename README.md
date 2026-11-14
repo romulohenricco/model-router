@@ -93,6 +93,19 @@ npm test
 Flags de decisão: `--risk`, `--sensitivity`, `--side-effects`, `--complexity`, `--latency`, `--budget`, `--author-provider`, `--unavailable`, `--session-account`, `--log`.
 Flags de execução: `--approve-shadow`, `--approve`, `--max-output-tokens`, `--timeout-ms`, `--no-fallback`.
 
+## Executáveis dos CLIs
+
+Por padrão o router (adapters, `doctor --live` e `init`) chama `claude` e `codex` pelo `PATH`. Para fixar um binário específico:
+
+| Variável | CLI | Padrão (não definida ou vazia) |
+|---|---|---|
+| `MODEL_ROUTER_CLAUDE_BIN` | Claude Code | `claude` |
+| `MODEL_ROUTER_CODEX_BIN` | Codex | `codex` |
+
+- O valor precisa ser um **caminho absoluto para um arquivo regular existente**; caso contrário a chamada falha antes de criar processo, com o erro estável `CLI_PATH_INVALID` (no `doctor --live`: `status: auth_probe_failed`, `error_code: CLI_PATH_INVALID`).
+- No Windows, shims `.cmd`/`.bat` são recusados (o Node não os executa sem shell); aponte para o `.exe` real.
+- As variáveis são configuração, não segredo: o router nunca as remove do ambiente e elas seguem para o processo filho.
+
 ## Credenciais
 
 O catálogo guarda só **referências**, nunca valores:

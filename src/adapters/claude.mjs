@@ -2,7 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { RouterError } from "../errors.mjs";
 import { runProcess } from "../process.mjs";
-import { normalizeUsage, RESPONSE_ONLY_SYSTEM, sanitizeEnvironment } from "./common.mjs";
+import { normalizeUsage, resolveCliCommand, RESPONSE_ONLY_SYSTEM, sanitizeEnvironment } from "./common.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const EMPTY_MCP = path.join(ROOT, "config", "empty-mcp.json");
@@ -46,13 +46,14 @@ export async function invokeClaude({
   systemPrompt = RESPONSE_ONLY_SYSTEM,
   run = runProcess
 }) {
+  const command = resolveCliCommand("claude");
   const env = sanitizeEnvironment([
     "ANTHROPIC_API_KEY",
     "ANTHROPIC_AUTH_TOKEN",
     "ANTHROPIC_BASE_URL"
   ]);
   const result = await run({
-    command: "claude",
+    command,
     args: [
       "--print",
       "--output-format", "json",
