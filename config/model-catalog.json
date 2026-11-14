@@ -79,6 +79,26 @@
         "billing_visibility": "provider balance may lag; billing history is previous-day",
         "note": "Example values: set funded_amount_usd to the credit you actually loaded and adjust the thresholds."
       }
+    },
+    "google": {
+      "enabled": true,
+      "mode": "active",
+      "adapter": "gemini_api",
+      "response_only": true,
+      "timeout_ms": 300000,
+      "billing": "free_tier_subscription",
+      "cost_tracking": "none",
+      "managed_by": "model_router",
+      "accounts": [
+        "google_default"
+      ],
+      "base_url": "https://generativelanguage.googleapis.com",
+      "inference_url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      "allowed_hosts": [
+        "generativelanguage.googleapis.com"
+      ],
+      "health_url": "https://generativelanguage.googleapis.com/v1beta/models",
+      "secret_ref": "env:GEMINI_API_KEY"
     }
   },
   "models": {
@@ -244,6 +264,51 @@
         "verifier"
       ],
       "version_note": "GPT-6.1 Terra — default coding worker. Requires Codex CLI >= 0.159.0."
+    },
+    "gemini-4-argon": {
+      "provider": "google",
+      "api_model": "gemini-4-argon",
+      "default_effort": "high",
+      "roles": [
+        "architect",
+        "verifier",
+        "deep_reasoning"
+      ],
+      "version_note": "Gemini 4 Argon — frontier reasoning model for architecture and subtle bug fixes."
+    },
+    "gemini-4-hydrogen": {
+      "provider": "google",
+      "api_model": "gemini-4-hydrogen",
+      "default_effort": "high",
+      "roles": [
+        "worker",
+        "verifier",
+        "coding_worker"
+      ],
+      "version_note": "Gemini 4 Hydrogen — fast, agentic execution model derived from Carbon."
+    },
+    "gemini-2.5-pro": {
+      "provider": "google",
+      "api_model": "gemini-2.5-pro",
+      "default_effort": "high",
+      "roles": [
+        "architect",
+        "verifier",
+        "researcher",
+        "mega_context"
+      ],
+      "version_note": "Gemini 2.5 Pro — 2M token context window, deep research and cross-vendor review."
+    },
+    "gemini-2.5-flash": {
+      "provider": "google",
+      "api_model": "gemini-2.5-flash",
+      "default_effort": "medium",
+      "roles": [
+        "worker",
+        "fast_tier",
+        "multimodal"
+      ],
+      "version_note": "Gemini 2.5 Flash — fast, multimodal workhorse for high-volume tasks."
     }
   }
 }

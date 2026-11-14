@@ -1,5 +1,6 @@
 import { RouterError } from "../errors.mjs";
 import { invokeClaude } from "./claude.mjs";
+import { invokeGemini } from "./gemini.mjs";
 import { invokeGlm } from "./glm.mjs";
 import { invokeMiniMax } from "./minimax.mjs";
 import { invokeOpenAI } from "./openai.mjs";
@@ -7,6 +8,7 @@ import { invokeOpenAI } from "./openai.mjs";
 const ADAPTERS = {
   claude_cli: invokeClaude,
   codex_cli: invokeOpenAI,
+  gemini_api: invokeGemini,
   minimax_anthropic: invokeMiniMax,
   glm_openai: invokeGlm
 };

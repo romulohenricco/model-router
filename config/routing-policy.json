@@ -21,12 +21,15 @@
         "claude-opus-5-5",
         "claude-sonnet-5-5",
         "claude-sonnet-5",
-        "gpt-6.1-terra"
+        "gpt-6.1-terra",
+        "gemini-4-argon",
+        "gemini-2.5-pro"
       ],
       "verifiers": [
         "claude-sonnet-5-5",
         "gpt-6.1-sol",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "gemini-4-argon"
       ],
       "effort_by_complexity": {
         "simple": "medium",
@@ -41,7 +44,9 @@
         "minimax-m2.7",
         "claude-sonnet-5-5",
         "claude-sonnet-5",
-        "claude-haiku-5-5"
+        "claude-haiku-5-5",
+        "gemini-4-hydrogen",
+        "gemini-2.5-flash"
       ],
       "verifiers": [
         "gpt-6.1-terra",
@@ -59,11 +64,14 @@
         "gpt-6-sol",
         "claude-sonnet-5-5",
         "claude-sonnet-5",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "gemini-4-argon",
+        "gemini-2.5-pro"
       ],
       "verifiers": [
         "claude-sonnet-5-5",
-        "gpt-6.1-sol"
+        "gpt-6.1-sol",
+        "gemini-4-argon"
       ],
       "effort_by_complexity": {
         "simple": "medium",
@@ -78,11 +86,14 @@
         "gpt-6.1-sol",
         "gpt-6-sol",
         "glm-5.1",
-        "gpt-6-luna"
+        "gpt-6-luna",
+        "gemini-2.5-pro",
+        "gemini-4-argon"
       ],
       "verifiers": [
         "gpt-6.1-sol",
-        "claude-sonnet-5-5"
+        "claude-sonnet-5-5",
+        "gemini-2.5-pro"
       ],
       "effort_by_complexity": {
         "simple": "low",
@@ -99,12 +110,15 @@
         "claude-sonnet-5",
         "gpt-6.1-sol",
         "gpt-6-sol",
-        "gpt-6.1-terra"
+        "gpt-6.1-terra",
+        "gemini-4-argon",
+        "gemini-2.5-pro"
       ],
       "verifiers": [
         "claude-sonnet-5-5",
         "gpt-6.1-sol",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "gemini-4-argon"
       ],
       "effort_by_complexity": {
         "simple": "medium",
@@ -119,7 +133,9 @@
         "claude-haiku-5-5",
         "claude-sonnet-5-5",
         "claude-sonnet-5",
-        "gpt-6.1-terra"
+        "gpt-6.1-terra",
+        "gemini-4-hydrogen",
+        "gemini-2.5-flash"
       ],
       "verifiers": [
         "claude-sonnet-5-5",
@@ -152,12 +168,15 @@
         "claude-sonnet-5-5",
         "claude-sonnet-5",
         "glm-5.1",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "gemini-4-argon",
+        "gemini-2.5-pro"
       ],
       "verifiers": [
         "claude-sonnet-5-5",
         "gpt-6.1-sol",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "gemini-4-argon"
       ],
       "effort_by_complexity": {
         "simple": "medium",
@@ -171,7 +190,9 @@
         "claude-sonnet-5",
         "gpt-6.1-terra",
         "gpt-6-luna",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "gemini-4-hydrogen",
+        "gemini-2.5-flash"
       ],
       "verifiers": [
         "gpt-6.1-sol",
@@ -192,7 +213,9 @@
         "gpt-6-sol",
         "gpt-6-astra",
         "claude-fable-5-1",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "gemini-2.5-pro",
+        "gemini-4-argon"
       ],
       "verifiers": [
         "claude-sonnet-5-5",
@@ -211,11 +234,14 @@
         "claude-sonnet-5",
         "gpt-6.1-sol",
         "gpt-6-sol",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "gemini-4-hydrogen",
+        "gemini-2.5-pro"
       ],
       "verifiers": [
         "claude-sonnet-5-5",
-        "gpt-6.1-sol"
+        "gpt-6.1-sol",
+        "gemini-4-hydrogen"
       ],
       "effort_by_complexity": {
         "simple": "low",

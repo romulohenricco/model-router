@@ -51,6 +51,7 @@ export function applyAnswers(catalog, policy, updatePolicy, answers) {
   c.providers.openai.enabled = answers.providers.includes("openai");
   c.providers.minimax.enabled = answers.providers.includes("minimax");
   c.providers.glm.enabled = answers.providers.includes("glm");
+  if (c.providers.google) c.providers.google.enabled = answers.providers.includes("google");
   if (answers.secrets === "1password") {
     if (answers.minimax_ref) c.providers.minimax.secret_ref = answers.minimax_ref;
     if (answers.glm_ref) c.providers.glm.secret_ref = answers.glm_ref;
