@@ -55,7 +55,9 @@ export async function invokeGemini({
 }) {
   const started = performance.now();
   const secret = await secretReader(provider.secret_ref);
-  const url = `${provider.base_url}/v1beta/models/${selection.api_model}:generateContent?key=${encodeURIComponent(secret)}`;
+  // The key travels only in the x-goog-api-key header: never in the URL, where it
+  // could leak through error messages, proxies or request logs.
+  const url = `${provider.base_url}/v1beta/models/${encodeURIComponent(selection.api_model)}:generateContent`;
 
   const body = {
     contents: [
@@ -78,7 +80,7 @@ export async function invokeGemini({
 
   const response = await postJson(url, {
     allowedHosts: provider.allowed_hosts,
-    headers: {},
+    headers: { "x-goog-api-key": secret },
     body,
     timeoutMs,
     fetchImpl

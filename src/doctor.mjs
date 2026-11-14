@@ -66,7 +66,8 @@ async function probe(providerId, provider, expectedModels) {
   try {
     const response = await fetch(provider.health_url, {
       method: "GET",
-      headers: { Authorization: `Bearer ${secret}` },
+      // Gemini authenticates with x-goog-api-key (never a ?key= query string).
+      headers: provider.adapter === "gemini_api" ? { "x-goog-api-key": secret } : { Authorization: `Bearer ${secret}` },
       signal: AbortSignal.timeout(15_000)
     });
     const result = {
