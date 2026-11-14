@@ -143,3 +143,18 @@ test("critical or destructive work is verified by the critical verifier first", 
   const highOnly = route({ category: "mechanical_coding", risk: "high" });
   assert.ok(highOnly.verifier, "high risk still verified");
 });
+
+test("confidential and restricted work never routes to Google Gemini", () => {
+  assert.ok(policy.guardrails.external_sensitive_providers.includes("google"));
+  for (const category of Object.keys(policy.routes)) {
+    for (const sensitivity of ["confidential", "restricted"]) {
+      for (const extra of [{}, { risk: "high" }, { risk: "critical" }, { side_effects: "deploy" }]) {
+        const decision = route({ category, sensitivity, ...extra });
+        const chosen = [decision.primary, ...(decision.fallbacks ?? []), decision.verifier].filter(Boolean);
+        assert.ok(chosen.every((s) => s.provider !== "google"), `${category}/${sensitivity} picked Gemini`);
+      }
+    }
+  }
+  const open = route({ category: "deep_reasoning", sensitivity: "internal" });
+  assert.ok(open.fallbacks.some((s) => s.provider === "google"), "internal work may still use Gemini");
+});

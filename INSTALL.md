@@ -20,7 +20,8 @@ Requisito: Node.js 20.12+ (sem dependências npm).
 2. **Provedores que você tem** — o roteador desliga os que você não tiver:
    - Claude via `claude` CLI logado (assinatura) · OpenAI via `codex` CLI logado (assinatura, ≥ 0.159)
    - Opcionais pagos por API, em modo *shadow*: MiniMax (`MINIMAX_API_KEY`) e GLM/Z.ai (`ZAI_API_KEY`).
-3. **Onde ficam as chaves** (só se usar MiniMax/GLM): variáveis de ambiente / arquivo `.env` (ignorado pelo Git) ou 1Password (`op://...`). O roteador guarda só a referência.
+   - Opcional: Google Gemini (API paga/gratuita, chave `GEMINI_API_KEY`) — o padrão é "sim" só se `GEMINI_API_KEY` já estiver definida. No nível gratuito o Google pode usar os prompts para melhorar seus produtos, por isso o roteador nunca envia trabalho `confidential`/`restricted` ao Gemini.
+3. **Onde ficam as chaves** (só se usar MiniMax/GLM/Gemini): variáveis de ambiente / arquivo `.env` (ignorado pelo Git) ou 1Password (`op://...`). O roteador guarda só a referência.
 4. **Atualização de modelos:** checar diariamente (recomendado), semanalmente ou só manual.
 5. **Ao achar modelo novo:** aplicar sozinho sucessores diretos depois de um smoke real (recomendado) ou só recomendar.
 6. **Integrações (se universal):** skill do Claude Code em `~/.claude/skills/model-router/` e/ou trecho para o `AGENTS.md` (Codex e outros agentes).

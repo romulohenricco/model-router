@@ -13,6 +13,9 @@ import { validateConfig } from "./config.mjs";
 import { routeTask } from "./router.mjs";
 import { resolveCliCommand } from "./adapters/common.mjs";
 
+// Providers that authenticate with an API key (env var or 1Password reference).
+export const API_KEY_PROVIDERS = ["minimax", "glm", "google"];
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 export function detectTool(command) {
@@ -46,7 +49,8 @@ export function detectEnvironment() {
     codex: detectTool("codex"),
     op: detectTool("op"),
     minimax_key: Boolean(process.env.MINIMAX_API_KEY),
-    zai_key: Boolean(process.env.ZAI_API_KEY)
+    zai_key: Boolean(process.env.ZAI_API_KEY),
+    gemini_key: Boolean(process.env.GEMINI_API_KEY)
   };
 }
 
@@ -70,12 +74,14 @@ export function applyAnswers(catalog, policy, updatePolicy, answers) {
   if (answers.secrets === "1password") {
     if (answers.minimax_ref) c.providers.minimax.secret_ref = answers.minimax_ref;
     if (answers.glm_ref) c.providers.glm.secret_ref = answers.glm_ref;
+    if (answers.gemini_ref && c.providers.google) c.providers.google.secret_ref = answers.gemini_ref;
   }
   u.auto = answers.update_mode !== "off";
   u.interval_hours = answers.update_mode === "weekly" ? 168 : 24;
   u.apply = answers.update_apply;
   if (!c.providers.openai.enabled) u.sources.openai = [];
   if (!c.providers.anthropic.enabled) u.sources.anthropic = [];
+  if (u.sources?.google && !c.providers.google?.enabled) u.sources.google = [];
   validateConfig(c, policy);
   return { catalog: c, updatePolicy: u };
 }
@@ -156,18 +162,21 @@ export async function runInit() {
     if (await ASK.yes(rl, `2b. Usar OpenAI (assinatura via codex CLI)?${env.codex.installed ? "" : " (CLI não encontrado)"}`, env.codex.installed)) providers.push("openai");
     if (await ASK.yes(rl, "2c. Usar MiniMax (API paga, opcional, modo shadow)?", env.minimax_key)) providers.push("minimax");
     if (await ASK.yes(rl, "2d. Usar GLM/Z.ai (API paga por crédito, opcional, modo shadow)?", env.zai_key)) providers.push("glm");
+    if (await ASK.yes(rl, "2e. Usar Google Gemini (API paga/gratuita, chave GEMINI_API_KEY)?", env.gemini_key)) providers.push("google");
     if (!providers.length) throw new Error("Escolha ao menos um provedor.");
 
     let secrets = "env";
     const refs = {};
-    if (providers.includes("minimax") || providers.includes("glm")) {
+    const usesApiKeys = API_KEY_PROVIDERS.some((p) => providers.includes(p));
+    if (usesApiKeys) {
       secrets = await ASK.choice(rl, "3. Onde ficam as chaves de API?", [
-        { label: "Variáveis de ambiente (MINIMAX_API_KEY / ZAI_API_KEY)", value: "env" },
+        { label: "Variáveis de ambiente (MINIMAX_API_KEY / ZAI_API_KEY / GEMINI_API_KEY)", value: "env" },
         { label: "1Password (referências op://)", value: "1password" }
       ], env.op.installed ? 1 : 0);
       if (secrets === "1password") {
         if (providers.includes("minimax")) refs.minimax_ref = (await rl.question("   Referência op:// da chave MiniMax: ")).trim();
         if (providers.includes("glm")) refs.glm_ref = (await rl.question("   Referência op:// da chave Z.ai: ")).trim();
+        if (providers.includes("google")) refs.gemini_ref = (await rl.question("   Referência op:// da chave Gemini: ")).trim();
       }
     }
 
@@ -229,7 +238,7 @@ export async function runInit() {
     if (integrations.includes("agents-snippet")) {
       console.log(`\nCole no AGENTS.md do seu projeto (ou no global do Codex):\n\n${skillText(cliPath).split("---").slice(2).join("---").trim()}\n`);
     }
-    if (secrets === "env" && (providers.includes("minimax") || providers.includes("glm"))) {
+    if (secrets === "env" && usesApiKeys) {
       await copyFile(path.join(ROOT, ".env.example"), path.join(ROOT, ".env"), fsConstants.COPYFILE_EXCL).catch(() => {});
       console.log("→ Preencha as chaves em .env (ou exporte no shell). O arquivo é ignorado pelo Git.");
     }

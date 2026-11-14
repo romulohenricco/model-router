@@ -41,3 +41,37 @@ test("route coverage reports routes that a single provider cannot serve", async 
   const full = routeCoverage(catalog, policy);
   assert.equal(full.broken.filter((x) => !x.startsWith("long_horizon")).length, 0);
 });
+
+test("init enables Google Gemini only when chosen", () => {
+  const { catalog: without, updatePolicy: uWithout } = applyAnswers(catalog, policy, updatePolicy, {
+    providers: ["anthropic", "openai"], secrets: "env", update_mode: "daily", update_apply: "direct_successors"
+  });
+  assert.equal(without.providers.google.enabled, false);
+  assert.deepEqual(uWithout.sources.google, []);
+  const decision = routeTask({ category: "deep_reasoning" }, without, policy);
+  assert.notEqual(decision.primary.provider, "google");
+
+  const { catalog: withGoogle, updatePolicy: uWith } = applyAnswers(catalog, policy, updatePolicy, {
+    providers: ["anthropic", "openai", "google"], secrets: "env", update_mode: "daily", update_apply: "direct_successors"
+  });
+  assert.equal(withGoogle.providers.google.enabled, true);
+  assert.equal(withGoogle.providers.google.secret_ref, "env:GEMINI_API_KEY");
+  assert.ok(uWith.sources.google.length > 0);
+});
+
+test("init stores a 1Password reference for the Gemini key", () => {
+  const { catalog: c } = applyAnswers(catalog, policy, updatePolicy, {
+    providers: ["anthropic", "google"], secrets: "1password", gemini_ref: "op://vault/gemini/credential", update_mode: "off", update_apply: "recommend_only"
+  });
+  assert.equal(c.providers.google.secret_ref, "op://vault/gemini/credential");
+  const { catalog: envOnly } = applyAnswers(catalog, policy, updatePolicy, {
+    providers: ["anthropic", "google"], secrets: "env", gemini_ref: "op://vault/gemini/credential", update_mode: "off", update_apply: "recommend_only"
+  });
+  assert.equal(envOnly.providers.google.secret_ref, "env:GEMINI_API_KEY");
+});
+
+test("environment detection reports whether GEMINI_API_KEY is set", async () => {
+  const { API_KEY_PROVIDERS } = await import("../src/init.mjs");
+  assert.ok(API_KEY_PROVIDERS.includes("google"));
+  assert.equal(typeof detectEnvironment().gemini_key, "boolean");
+});

@@ -253,7 +253,8 @@
   "guardrails": {
     "external_sensitive_providers": [
       "minimax",
-      "glm"
+      "glm",
+      "google"
     ],
     "sensitive_levels": [
       "confidential",

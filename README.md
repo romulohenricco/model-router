@@ -28,7 +28,7 @@ tarefa ─► routeTask (puro, sem rede) ─► decisão {primary, fallbacks, ve
 - `src/budget.mjs` / `src/cost.mjs` — custo estimado e *hard stop* para provedores pagos por crédito de API.
 - `src/telemetry.mjs` — logs JSONL seguros (sem prompt, resposta ou segredo).
 
-### Catálogo incluído (15 modelos)
+### Catálogo incluído (19 modelos)
 
 | Provedor | Modelos | Modo |
 |---|---|---|
@@ -36,8 +36,9 @@ tarefa ─► routeTask (puro, sem rede) ─► decisão {primary, fallbacks, ve
 | OpenAI (via `codex` CLI) | GPT-6.1 Sol, GPT-6.1 Terra, GPT-6 Astra, GPT-6 Sol, GPT-6 Luna (+ GPT-5.6 Terra legado) | ativo |
 | MiniMax M2.7 | API Anthropic-compatível | opcional, *shadow* |
 | GLM 5.1 | API OpenAI-compatível | opcional, *shadow* + orçamento |
+| Google (API Gemini) | Gemini 4 Argon, Gemini 4 Hydrogen, Gemini 2.5 Pro, Gemini 2.5 Flash | ativo, opcional (chave `GEMINI_API_KEY`) |
 
-Modelos de assinatura usam o login do próprio CLI — **nenhuma chave é necessária** para Anthropic/OpenAI.
+Modelos de assinatura usam o login do próprio CLI — **nenhuma chave é necessária** para Anthropic/OpenAI. O Google Gemini é opcional e usa uma chave da API Gemini (`GEMINI_API_KEY`, nível pago ou gratuito); sem ela, desative o provedor (`"enabled": false`) ou responda "não" no `init`.
 
 ### Categorias
 
@@ -48,8 +49,8 @@ Modelos de assinatura usam o login do próprio CLI — **nenhuma chave é necess
 O roteador verifica **uma vez por dia** se os provedores lançaram modelos novos e se mantém atualizado sozinho.
 
 - **Quando roda:** ao usar `route` ou `dispatch`, se a última checagem tiver mais de 24 h, dispara em segundo plano (nunca bloqueia nem atrasa a decisão).
-- **Fontes (sem chave de API):** cache local do Codex CLI (`~/.codex/models_cache.json`) e as páginas públicas de modelos da Anthropic e da OpenAI (só hosts em allowlist).
-- **O que aplica sozinho:** apenas **sucessores diretos** na mesma linha de modelo (ex.: `claude-haiku-5-5` → `claude-haiku-5-7`, `gpt-6.1-sol` → `gpt-6.2-sol`). O novo modelo assume os mesmos papéis em todas as rotas; o anterior vira o primeiro fallback.
+- **Fontes (sem chave de API):** cache local do Codex CLI (`~/.codex/models_cache.json`) e as páginas públicas de modelos da Anthropic, da OpenAI e do Google Gemini (`ai.google.dev/gemini-api/docs/models.md`) — só hosts em allowlist.
+- **O que aplica sozinho:** apenas **sucessores diretos** na mesma linha de modelo (ex.: `claude-haiku-5-5` → `claude-haiku-5-7`, `gpt-6.1-sol` → `gpt-6.2-sol`, `gemini-2.5-flash` → `gemini-3.8-flash`). No Gemini, variantes com sufixo (`-lite`, `-tts`, `-image`, `-live`, `-preview`) nunca contam como sucessor. O novo modelo assume os mesmos papéis em todas as rotas; o anterior vira o primeiro fallback.
 - **Trava de segurança:** antes de trocar, faz um *smoke* real (“PONG”) no modelo novo. Se falhar, não aplica e deixa como pendente.
 - **Só recomenda:** linhas novas (um modelo sem antecessor no catálogo) e modelos marcados com `"pinned": true` no catálogo.
 - **Aviso:** depois de uma troca, o `route`/`dispatch` mostra uma linha no `stderr` até você confirmar com `update-status --ack`. Backups do config ficam em `logs/updates/backups/`.
@@ -120,7 +121,8 @@ Chaves ficam só em memória durante a chamada.
 - Dispatch **response-only**: não edita arquivos, não executa comandos gerados pelos modelos, não faz deploy.
 - Claude CLI sem tools/MCP/persistência; Codex efêmero, read-only, sem busca/plugins.
 - APIs só por HTTPS e hosts em allowlist.
-- Dados `confidential`/`restricted` bloqueiam provedores externos (MiniMax/GLM).
+- Dados `confidential`/`restricted` bloqueiam provedores externos (MiniMax/GLM/Google Gemini) via `guardrails.external_sensitive_providers`. O Gemini está nessa lista porque, no nível gratuito da API Gemini, o Google pode usar prompts e respostas para melhorar seus produtos; trabalho confidencial ou restrito nunca é roteado para ele (nem como fallback ou verificador).
+- A chave do Gemini vai só no header `x-goog-api-key`, nunca na URL; erros e logs não incluem a chave.
 - Provedores *shadow* exigem `--approve-shadow`; alto risco/deploy/destrutivo exige `--approve`.
 - Resposta rejeitada pelo verificador **não** é devolvida como final.
 
@@ -133,7 +135,7 @@ JSONL em `./logs/YYYY-MM-DD.jsonl` (ou `MODEL_ROUTER_LOG_DIR`), com IDs, categor
 1. **Modelos**: edite `config/model-catalog.json` (adicione/remova modelos, ajuste `api_model`, papéis e esforço padrão).
 2. **Política**: edite `config/routing-policy.json` — `primary`, `fallbacks`, `verifiers` e `effort_by_complexity` por categoria; `guardrails.safe_controller` e `critical_verifier`. A validação (`node src/cli.mjs check`) falha se uma rota citar modelo inexistente.
 3. **Contas**: os aliases em `providers.*.accounts` são rótulos lógicos. O alias Claude não é verificável pelo CLI (`account_verified=false`).
-4. **Provedores opcionais**: para desativar MiniMax/GLM, ponha `"enabled": false`.
+4. **Provedores opcionais**: para desativar MiniMax/GLM/Google, ponha `"enabled": false`.
 5. **Novos modelos**: após adicionar, faça um smoke real de dispatch antes de promover a primário — estar listado no CLI não prova equivalência de qualidade.
 6. Rode `npm test` e ajuste as asserções de `tests/router.test.mjs` à sua política.
 
