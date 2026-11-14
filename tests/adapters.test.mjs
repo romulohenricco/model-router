@@ -87,3 +87,38 @@ test("GLM parser extracts OpenAI-compatible content", () => {
   assert.equal(output.cost_basis, "official_list_price_estimate");
   assert.equal(JSON.stringify(output).includes("private"), false);
 });
+
+test("Codex skill discovery skips dangling junctions/symlinks and unreadable folders", async (t) => {
+  const { mkdtemp, mkdir, writeFile, symlink, rm, realpath } = await import("node:fs/promises");
+  const os = await import("node:os");
+  const path = await import("node:path");
+  const { collectSkillPaths } = await import("../src/adapters/openai.mjs");
+  const root = await mkdtemp(path.join(os.tmpdir(), "mr-skills-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const skills = path.join(root, "skills");
+  await mkdir(path.join(skills, "good"), { recursive: true });
+  await writeFile(path.join(skills, "good", "SKILL.md"), "---\nname: good\n---\n");
+  await mkdir(path.join(skills, "group", "nested"), { recursive: true });
+  await writeFile(path.join(skills, "group", "nested", "SKILL.md"), "---\nname: nested\n---\n");
+
+  const gone = path.join(root, "gone");
+  await mkdir(gone);
+  let linked = 0;
+  for (const [name, type] of [["dangling-junction", "junction"], ["dangling-symlink", "dir"]]) {
+    try {
+      await symlink(gone, path.join(skills, name), type);
+      linked += 1;
+    } catch (error) {
+      if (!["EPERM", "EACCES", "ENOTSUP", "EINVAL"].includes(error.code)) throw error;
+    }
+  }
+  await rm(gone, { recursive: true, force: true });
+  if (!linked) t.diagnostic("this OS refused to create links; only the plain discovery path was checked");
+
+  const found = await collectSkillPaths(skills);
+  assert.deepEqual(new Set(found), new Set([
+    await realpath(path.join(skills, "good")),
+    await realpath(path.join(skills, "group", "nested"))
+  ]));
+  assert.deepEqual(await collectSkillPaths(path.join(root, "missing")), []);
+});

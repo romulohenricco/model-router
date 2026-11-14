@@ -16,15 +16,26 @@ async function exists(filePath) {
   }
 }
 
-async function collectSkillPaths(root, depth = 0) {
+// Skill roots may contain broken symlinks/junctions or unreadable folders; those
+// entries are skipped instead of failing the whole Codex invocation.
+export async function collectSkillPaths(root, depth = 0) {
   if (depth > 2 || !await exists(root)) return [];
-  const entries = await readdir(root, { withFileTypes: true });
+  let entries;
+  try {
+    entries = await readdir(root, { withFileTypes: true });
+  } catch {
+    return [];
+  }
   const paths = [];
   for (const entry of entries) {
     if (!entry.isDirectory() && !entry.isSymbolicLink()) continue;
     const candidate = path.join(root, entry.name);
-    if (await exists(path.join(candidate, "SKILL.md"))) paths.push(await realpath(candidate));
-    else paths.push(...await collectSkillPaths(candidate, depth + 1));
+    try {
+      if (await exists(path.join(candidate, "SKILL.md"))) paths.push(await realpath(candidate));
+      else paths.push(...await collectSkillPaths(candidate, depth + 1));
+    } catch {
+      // dangling or unreadable link: skip it
+    }
   }
   return paths;
 }
