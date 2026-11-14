@@ -198,3 +198,9 @@ test("a failed apply is recorded in the state and keeps catalog and policy consi
   assert.ok((await readUpdateState(logRoot)).last_error);
   assert.match(await pendingNotice(logRoot), /last update failed/);
 });
+
+test("gemini ids with a multi-digit major (page anchors like gemini-25-flash) are not versions", () => {
+  const glines = { ...lines, google: ["carbon", "argon", "hydrogen", "pro", "flash"] };
+  assert.equal(parseModelId("gemini-25-flash", glines), null);
+  assert.deepEqual(parseModelId("gemini-3.8-flash", glines)?.version, [3, 8]);
+});

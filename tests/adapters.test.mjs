@@ -122,3 +122,11 @@ test("Codex skill discovery skips dangling junctions/symlinks and unreadable fol
   ]));
   assert.deepEqual(await collectSkillPaths(path.join(root, "missing")), []);
 });
+
+test("Gemini and Google keys never reach CLI child processes", async () => {
+  const { sanitizeEnvironment } = await import("../src/adapters/common.mjs");
+  const env = sanitizeEnvironment([], { GEMINI_API_KEY: "x", GOOGLE_API_KEY: "y", PATH: "p" });
+  assert.equal(env.GEMINI_API_KEY, undefined);
+  assert.equal(env.GOOGLE_API_KEY, undefined);
+  assert.equal(env.PATH, "p");
+});

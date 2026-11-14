@@ -20,7 +20,7 @@ export function normalizeUsage(inputTokens, outputTokens, extra = {}) {
   };
 }
 
-const THIRD_PARTY_SECRETS = ["MINIMAX_API_KEY", "ZAI_API_KEY", "GLM_API_KEY", "OP_SERVICE_ACCOUNT_TOKEN"];
+const THIRD_PARTY_SECRETS = ["MINIMAX_API_KEY", "ZAI_API_KEY", "GLM_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY", "OP_SERVICE_ACCOUNT_TOKEN"];
 
 // Provider CLI overrides are configuration, not secrets: they are always passed
 // through to child processes, even if a caller lists them for removal.

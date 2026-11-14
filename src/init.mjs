@@ -45,8 +45,8 @@ export function detectEnvironment() {
   return {
     os: `${process.platform} ${os.release()}`,
     node: process.version,
-    claude: detectTool("claude"),
-    codex: detectTool("codex"),
+    claude: detectCli("claude"),
+    codex: detectCli("codex"),
     op: detectTool("op"),
     minimax_key: Boolean(process.env.MINIMAX_API_KEY),
     zai_key: Boolean(process.env.ZAI_API_KEY),

@@ -41,7 +41,7 @@ export function parseModelId(id, lines = {}) {
   }
   // Google: gemini-<major>[.<minor>]-<line>. Variants with any extra suffix
   // (-lite, -tts, -image, -live, -preview, dated snapshots...) are not successors.
-  m = /^gemini-(\d+)(?:\.(\d+))?-([a-z]+)$/.exec(id);
+  m = /^gemini-(\d)(?:\.(\d+))?-([a-z]+)$/.exec(id);
   if (m && (lines.google ?? []).includes(m[3])) {
     return { provider: "google", line: m[3], version: [Number(m[1]), Number(m[2] ?? 0)] };
   }
