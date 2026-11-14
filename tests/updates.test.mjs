@@ -53,16 +53,28 @@ test("Google docs extractor reads model codes, not anchors or links", () => {
 });
 
 test("Gemini: a newer flash is a direct successor and a new line is only recommended", () => {
-  const plan = planUpdates(catalog, {
+  // Fixture = the catalog as it was before 3.8 Flash / 4 Carbon were added.
+  const oldCatalog = structuredClone(catalog);
+  delete oldCatalog.models["gemini-3.8-flash"];
+  delete oldCatalog.models["gemini-4-carbon"];
+  const oldPolicy = structuredClone(policy);
+  for (const r of Object.values(oldPolicy.routes)) {
+    r.fallbacks = r.fallbacks.map((m) => (m === "gemini-3.8-flash" ? "gemini-2.5-flash" : m)).filter((m) => m !== "gemini-4-carbon");
+    r.verifiers = r.verifiers.filter((m) => m !== "gemini-4-carbon");
+  }
+  const plan = planUpdates(oldCatalog, {
     google: ["gemini-4-carbon", "gemini-4-argon", "gemini-4-hydrogen", "gemini-3.8-flash", "gemini-3.8-flash-tts", "gemini-3.1-pro-preview", "gemini-2.5-pro"]
   }, updatePolicy);
   assert.deepEqual(plan.updates.map((u) => [u.from, u.to, u.action]), [["gemini-2.5-flash", "gemini-3.8-flash", "replace"]]);
   assert.deepEqual(plan.new_lines.map((n) => [n.model, n.action]), [["gemini-4-carbon", "recommend_only"]]);
-  const { catalog: c, policy: p } = applyPlan(catalog, policy, plan, { date: "2030-01-01" });
+  const { catalog: c, policy: p } = applyPlan(oldCatalog, oldPolicy, plan, { date: "2030-01-01" });
   assert.equal(c.models["gemini-3.8-flash"].provider, "google");
   assert.ok(!c.models["gemini-4-carbon"]);
   assert.ok(Object.values(p.routes).some((r) => r.fallbacks.includes("gemini-3.8-flash")));
   assert.ok(p.guardrails.external_sensitive_providers.includes("google"));
+  // The shipped catalog already carries 3.8 Flash and 4 Carbon: nothing pending for Google.
+  const current = planUpdates(catalog, { google: ["gemini-4-carbon", "gemini-4-argon", "gemini-3.8-flash"] }, updatePolicy);
+  assert.equal(current.updates.length + current.new_lines.length, 0);
 });
 
 test("update policy allowlists the Google models page", () => {

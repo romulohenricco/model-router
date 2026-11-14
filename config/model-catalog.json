@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-12",
+  "updated_at": "2026-11-14",
   "providers": {
     "anthropic": {
       "enabled": true,
@@ -297,7 +297,7 @@
         "researcher",
         "mega_context"
       ],
-      "version_note": "Gemini 2.5 Pro — 2M token context window, deep research and cross-vendor review."
+      "version_note": "Gemini 2.5 Pro — obsoleto (o Google redireciona as chamadas para o 3.8 Flash); fora das rotas, substituído pelo 4 Carbon."
     },
     "gemini-2.5-flash": {
       "provider": "google",
@@ -308,7 +308,30 @@
         "fast_tier",
         "multimodal"
       ],
-      "version_note": "Gemini 2.5 Flash — fast, multimodal workhorse for high-volume tasks."
+      "version_note": "Gemini 2.5 Flash — obsoleto (redirecionado para o 3.8 Flash); fora das rotas."
+    },
+    "gemini-4-carbon": {
+      "provider": "google",
+      "api_model": "gemini-4-carbon",
+      "default_effort": "high",
+      "roles": [
+        "architect",
+        "verifier",
+        "researcher",
+        "mega_context"
+      ],
+      "version_note": "Gemini 4 Carbon — modelo de raciocínio mais forte do Google (substitui o 2.5 Pro, obsoleto)."
+    },
+    "gemini-3.8-flash": {
+      "provider": "google",
+      "api_model": "gemini-3.8-flash",
+      "default_effort": "medium",
+      "roles": [
+        "worker",
+        "fast_tier",
+        "multimodal"
+      ],
+      "version_note": "Gemini 3.8 Flash — sucessor direto do 2.5 Flash."
     }
   }
 }

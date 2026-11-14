@@ -28,7 +28,7 @@ tarefa ─► routeTask (puro, sem rede) ─► decisão {primary, fallbacks, ve
 - `src/budget.mjs` / `src/cost.mjs` — custo estimado e *hard stop* para provedores pagos por crédito de API.
 - `src/telemetry.mjs` — logs JSONL seguros (sem prompt, resposta ou segredo).
 
-### Catálogo incluído (19 modelos)
+### Catálogo incluído (21 modelos)
 
 | Provedor | Modelos | Modo |
 |---|---|---|
@@ -36,7 +36,7 @@ tarefa ─► routeTask (puro, sem rede) ─► decisão {primary, fallbacks, ve
 | OpenAI (via `codex` CLI) | GPT-6.1 Sol, GPT-6.1 Terra, GPT-6 Astra, GPT-6 Sol, GPT-6 Luna (+ GPT-5.6 Terra legado) | ativo |
 | MiniMax M2.7 | API Anthropic-compatível | opcional, *shadow* |
 | GLM 5.1 | API OpenAI-compatível | opcional, *shadow* + orçamento |
-| Google (API Gemini) | Gemini 4 Argon, Gemini 4 Hydrogen, Gemini 2.5 Pro, Gemini 2.5 Flash | ativo, opcional (chave `GEMINI_API_KEY`) |
+| Google (API Gemini) | Gemini 4 Carbon, Gemini 4 Argon, Gemini 4 Hydrogen, Gemini 3.8 Flash (+ Gemini 2.5 Pro/Flash como legado, fora das rotas) | ativo, opcional (chave `GEMINI_API_KEY`) |
 
 Modelos de assinatura usam o login do próprio CLI — **nenhuma chave é necessária** para Anthropic/OpenAI. O Google Gemini é opcional e usa uma chave da API Gemini (`GEMINI_API_KEY`, nível pago ou gratuito); sem ela, desative o provedor (`"enabled": false`) ou responda "não" no `init`.
 
@@ -50,7 +50,7 @@ O roteador verifica **uma vez por dia** se os provedores lançaram modelos novos
 
 - **Quando roda:** ao usar `route` ou `dispatch`, se a última checagem tiver mais de 24 h, dispara em segundo plano (nunca bloqueia nem atrasa a decisão).
 - **Fontes (sem chave de API):** cache local do Codex CLI (`~/.codex/models_cache.json`) e as páginas públicas de modelos da Anthropic, da OpenAI e do Google Gemini (`ai.google.dev/gemini-api/docs/models.md`) — só hosts em allowlist.
-- **O que aplica sozinho:** apenas **sucessores diretos** na mesma linha de modelo (ex.: `claude-haiku-5-5` → `claude-haiku-5-7`, `gpt-6.1-sol` → `gpt-6.2-sol`, `gemini-2.5-flash` → `gemini-3.8-flash`). No Gemini, variantes com sufixo (`-lite`, `-tts`, `-image`, `-live`, `-preview`) nunca contam como sucessor. O novo modelo assume os mesmos papéis em todas as rotas; o anterior vira o primeiro fallback.
+- **O que aplica sozinho:** apenas **sucessores diretos** na mesma linha de modelo (ex.: `claude-haiku-5-5` → `claude-haiku-5-7`, `gpt-6.1-sol` → `gpt-6.2-sol`, `gemini-3.8-flash` → `gemini-3.9-flash`). No Gemini, variantes com sufixo (`-lite`, `-tts`, `-image`, `-live`, `-preview`) nunca contam como sucessor. O novo modelo assume os mesmos papéis em todas as rotas; o anterior vira o primeiro fallback.
 - **Trava de segurança:** antes de trocar, faz um *smoke* real (“PONG”) no modelo novo. Se falhar, não aplica e deixa como pendente.
 - **Só recomenda:** linhas novas (um modelo sem antecessor no catálogo) e modelos marcados com `"pinned": true` no catálogo.
 - **Aviso:** depois de uma troca, o `route`/`dispatch` mostra uma linha no `stderr` até você confirmar com `update-status --ack`. Backups do config ficam em `logs/updates/backups/`.
