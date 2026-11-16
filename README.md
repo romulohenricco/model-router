@@ -1,5 +1,25 @@
 # Model Router (template)
 
+## 🚀 Comece aqui: instalação em 1 passo
+
+Abra seu agente de IA (Claude Code, Codex, Cursor…) na pasta onde você guarda suas ferramentas, **copie o texto abaixo e cole no chat**. O agente vai perguntar quais IAs você usa e configurar tudo para a sua máquina. Ele não altera nada sem o seu "sim".
+
+```text
+Quero instalar o model-router: https://github.com/romulohenricco/model-router
+
+1. Clone o repositório numa pasta de ferramentas minha (pergunte onde, sugira uma) e leia AGENTS.md e INSTALL.md antes de qualquer coisa. Siga as regras desses arquivos.
+2. Detecte meu ambiente sem alterar nada: sistema operacional, versão do Node (precisa ser 20.12 ou maior), se tenho os CLIs `claude`, `codex` e `op` e quais destas variáveis existem: GEMINI_API_KEY, MINIMAX_API_KEY, ZAI_API_KEY. Veja também como meus projetos estão organizados: CLAUDE.md, AGENTS.md, ~/.claude/skills, regras do Cursor etc.
+3. Pergunte quais LLMs eu realmente uso hoje e quais tenho só às vezes. As que eu uso viram ATIVAS e podem ser roteadas. As outras ficam em STAND-BY: "enabled": false no config/model-catalog.json, continuam no catálogo e eu ligo depois. Se eu citar uma LLM que o roteador não suporta, diga isso com clareza e não invente adaptador.
+4. Faça as demais perguntas do INSTALL.md, uma rodada por vez e com a sua recomendação: uso universal ou só no projeto, onde ficam as chaves (.env ou 1Password), frequência da atualização de modelos e integração com meus agentes.
+5. Mostre um resumo e ESPERE meu "sim" antes de editar config/, rodar npm link, criar arquivos em ~/.claude/ ou mexer em .env. Nunca grave chave real em arquivo.
+6. Aplique e valide com `node src/cli.mjs check`, `node --test` e `node src/cli.mjs doctor`. Mostre quais rotas ficaram limitadas ou vão parar por falta de um modelo revisor e explique em uma linha o que eu ganharia ligando outro provedor.
+7. No final, me diga como tirar uma LLM do stand-by quando eu passar a usar: rodar `node src/cli.mjs init` de novo, ou pedir para você mudar "enabled" para true e rodar `node src/cli.mjs update-check`.
+```
+
+Requisito: Node.js 20.12 ou mais novo. Claude e OpenAI usam o login dos próprios CLIs, sem chave de API.
+
+---
+
 Roteador **determinístico e auditável** de modelos de IA. Dada uma tarefa (categoria, risco, sensibilidade, complexidade, orçamento), ele decide **provedor, modelo, conta, esforço, fallbacks e verificador independente** — sem inferência e sem rede na decisão — e, se você quiser, despacha o pedido em modo *response-only*.
 
 Este repositório é um **template**: clique em **Use this template** no GitHub, clone e rode a instalação guiada:
