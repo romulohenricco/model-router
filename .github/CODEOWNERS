@@ -1,0 +1,8 @@
+# Dono do código: toda mudança em qualquer arquivo precisa da aprovação dele.
+# Contribuidores entram em CONTRIBUTORS.md, mas não ganham escrita no repositório.
+*                     @romulohenricco
+/.github/             @romulohenricco
+/config/              @romulohenricco
+/src/                 @romulohenricco
+/SECURITY.md          @romulohenricco
+/CONTRIBUTING.md      @romulohenricco

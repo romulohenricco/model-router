@@ -1,5 +1,11 @@
 name: test
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, next]
+  pull_request:
+    branches: [main, next]
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -8,4 +14,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - run: node src/cli.mjs check
       - run: node --test
+        env:
+          MODEL_ROUTER_AUTO_UPDATE: "0"
+      - name: Nenhum segredo no diff
+        run: |
+          if grep -RInE '(sk-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{30,}|xai-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{30,})' --exclude-dir=.git --exclude-dir=node_modules .; then
+            echo "Possível chave encontrada. Remova e revogue." && exit 1
+          fi

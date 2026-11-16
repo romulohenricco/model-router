@@ -1,0 +1,46 @@
+name: Novo provedor / LLM
+description: Pedir ou propor a integração de uma LLM que está no Backlog (Grok, DeepSeek, Muse...)
+title: "[provedor] "
+labels: ["provedor", "backlog"]
+body:
+  - type: input
+    id: provedor
+    attributes:
+      label: Provedor e modelo
+      placeholder: "ex.: xAI — grok-5"
+    validations:
+      required: true
+  - type: dropdown
+    id: api
+    attributes:
+      label: Tipo de API
+      options:
+        - OpenAI-compatível
+        - Anthropic-compatível
+        - Proprietária
+        - CLI local
+        - Não sei
+    validations:
+      required: true
+  - type: input
+    id: docs
+    attributes:
+      label: Link da documentação oficial (fonte primária)
+    validations:
+      required: true
+  - type: dropdown
+    id: dados
+    attributes:
+      label: O provedor usa prompts para treinar modelos?
+      options:
+        - Não (contrato/termos garantem)
+        - Sim, em algum plano
+        - Não sei
+    validations:
+      required: true
+  - type: checkboxes
+    id: pr
+    attributes:
+      label: Contribuição
+      options:
+        - label: Quero implementar e abrir o PR para a branch `next`

@@ -165,6 +165,16 @@ JSONL em `./logs/YYYY-MM-DD.jsonl` (ou `MODEL_ROUTER_LOG_DIR`), com IDs, categor
 - O Codex CLI injeta o catálogo global de skills no contexto de entrada (visível em `usage`).
 - Custo do GLM é estimativa local por tokens; reconcilie no painel do provedor.
 
+## Backlog
+
+**Última atualização — v1.0.0 (2026-11-16): Roteamento Determinístico de LLMs** (Claude, ChatGPT, Gemini, MiniMax e GLM).
+
+- Claude, ChatGPT e Gemini na última versão: `claude-fable-5-2`, `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-haiku-5-5` · `gpt-6.1-sol`, `gpt-6.1-terra`, `gpt-6-astra`, `gpt-6-luna` · `gemini-4-carbon`, `gemini-4-argon`, `gemini-4-hydrogen`, `gemini-3.8-flash`.
+- ⚠️ MiniMax (`MiniMax-M2.7`) e GLM (`glm-5.1`) estão uma geração atrás; a troca para `MiniMax-M3` e `glm-5.3` está prevista na v1.1.0.
+- Pendentes: Grok, DeepSeek, Muse, Kimi, Qwen, Mistral, modelos locais (Ollama/LM Studio), Cohere, OpenRouter, Perplexity e Amazon Nova. [Contribua](CONTRIBUTING.md).
+
+📋 Lista completa de versões, modelos e pendentes: **[BACKLOG.md](BACKLOG.md)**
+
 ## Licença
 
-[MIT](LICENSE). Use, adapte e redistribua à vontade.
+[MIT](LICENSE). Use, adapte e redistribua à vontade. Contribuições: [CONTRIBUTING.md](CONTRIBUTING.md) · Segurança: [SECURITY.md](SECURITY.md) · Quem ajudou: [CONTRIBUTORS.md](CONTRIBUTORS.md).

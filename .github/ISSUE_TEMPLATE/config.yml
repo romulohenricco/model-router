@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Falha de segurança (privado)
+    url: https://github.com/romulohenricco/model-router/security/advisories/new
+    about: Não abra issue pública para vulnerabilidade. Use o relato privado.

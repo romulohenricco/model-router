@@ -1,0 +1,25 @@
+name: Bug
+description: Algo não funciona como o README descreve
+labels: ["bug"]
+body:
+  - type: textarea
+    id: oque
+    attributes:
+      label: O que aconteceu e o que você esperava
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Comando para reproduzir
+      description: "Saída de `node src/cli.mjs route ...` ou `doctor`. NUNCA cole chaves, tokens, prompts privados ou dados pessoais."
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: versao
+    attributes:
+      label: Versão (Backlog do README) e Node
+      placeholder: "v1.0.0 · Node 22.x · Windows/macOS/Linux"
+    validations:
+      required: true
