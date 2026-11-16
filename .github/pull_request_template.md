@@ -4,7 +4,7 @@
 
 ## Checklist (obrigatório)
 
-- [ ] O PR aponta para a branch **`next`**, não para `main`.
+- [ ] O PR aponta para a branch **`stage`**, não para `main`.
 - [ ] `node --test` e `node src/cli.mjs check` passam localmente.
 - [ ] Nenhuma chave, token, `.env`, prompt privado ou dado pessoal no diff.
 - [ ] Credenciais só como referência (`env:VAR` ou `op://...`) no catálogo.

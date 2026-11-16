@@ -7,7 +7,7 @@ Obrigado por ajudar! Este é um repositório público e open-source (MIT). Qualq
 | Papel | Quem | O que pode |
 |---|---|---|
 | Dono do código (CODEOWNER) | [@romulohenricco](https://github.com/romulohenricco) | Aprovar, fazer merge, publicar versão, mexer em `main` |
-| Contribuidor | Qualquer pessoa com PR aceito | Entra em [CONTRIBUTORS.md](CONTRIBUTORS.md). **Não** recebe acesso de escrita, push em `main`/`next`, nem permissão de admin |
+| Contribuidor | Qualquer pessoa com PR aceito | Entra em [CONTRIBUTORS.md](CONTRIBUTORS.md). **Não** recebe acesso de escrita, push em `main`/`stage`, nem permissão de admin |
 
 Ser listado como contribuidor é reconhecimento, não permissão. O acesso de escrita continua só com o dono.
 
@@ -15,17 +15,17 @@ Ser listado como contribuidor é reconhecimento, não permissão. O acesso de es
 
 | Branch | Para quê | Quem faz merge |
 |---|---|---|
-| `main` | Produção: o que quem instala recebe | Só o dono, a partir de `next` |
-| `next` | Integração das contribuições da comunidade (ex.: provedores do Backlog) | Só o dono, depois de revisar o PR |
+| `main` | Produção: o que quem instala recebe | Só o dono, a partir de `stage` |
+| `stage` | Integração das contribuições da comunidade (ex.: provedores do Backlog) | Só o dono, depois de revisar o PR |
 | `seu-fork/...` | Seu trabalho | Você |
 
 Fluxo:
 
 1. Abra (ou escolha) uma issue, por exemplo **"Novo provedor / LLM"**.
-2. Faça um **fork** e crie uma branch: `provider/grok`, `fix/<assunto>` ou `docs/<assunto>`.
-3. Abra o PR **para `next`**. PR para `main` é fechado e redirecionado.
+2. Faça um **fork** e crie uma branch: `feat/provider-grok`, `fix/descricao-curta` ou `docs/descricao-curta` (padrão `tipo/descricao` em kebab-case; tipos: feat, fix, chore, docs, refactor, test, perf, ci).
+3. Abra o PR **para `stage`**. PR para `main` é fechado e redirecionado.
 4. O CI precisa passar e o dono precisa aprovar (CODEOWNERS). Ninguém faz merge sem essa aprovação.
-5. Quando `next` estiver estável, o dono promove para `main`, sobe a versão e atualiza o **Backlog** do README.
+5. Quando `stage` estiver estável, o dono promove para `main`, sobe a versão e atualiza o **Backlog** do README.
 
 ## Regras de segurança (inegociáveis)
 

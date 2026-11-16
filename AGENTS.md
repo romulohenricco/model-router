@@ -19,4 +19,4 @@ Se o usuário pedir para instalar/configurar, **não instale direto**. Siga `INS
 - Não coloque o prompt do usuário na linha de comando: `dispatch` lê só de stdin.
 - Respeite as decisões do roteador: `fail_closed` → parar; `shadow` → pedir aprovação; risco alto/deploy/destrutivo → pedir aprovação.
 - Se o `route`/`dispatch` mostrar no stderr um aviso `model-router: updated ...`, conte ao usuário quais modelos mudaram.
-- Toda mudança no `README.md` atualiza o `BACKLOG.md` (lista completa) e a seção **Backlog** do README (só a última atualização + link); `tests/readme-backlog.test.mjs` confere. Contribuições seguem `CONTRIBUTING.md`: PR para `next`, nunca direto em `main`.
+- Toda mudança no `README.md` atualiza o `BACKLOG.md` (lista completa) e a seção **Backlog** do README (só a última atualização + link); `tests/readme-backlog.test.mjs` confere. Contribuições seguem `CONTRIBUTING.md`: PR para `stage`, nunca direto em `main`.

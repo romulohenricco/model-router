@@ -43,4 +43,4 @@ body:
     attributes:
       label: Contribuição
       options:
-        - label: Quero implementar e abrir o PR para a branch `next`
+        - label: Quero implementar e abrir o PR para a branch `stage`

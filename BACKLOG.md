@@ -72,7 +72,7 @@ Fontes: [MiniMax release notes](https://platform.minimax.io/docs/release-notes/m
 
 ## Pendentes — LLMs ainda não suportadas
 
-Quer ajudar? Abra uma issue **"Novo provedor / LLM"** e um PR para a branch `next` (veja [CONTRIBUTING.md](CONTRIBUTING.md)). Todo provedor novo entra **desligado** (stand-by) e na lista de provedores externos, para nunca receber dado confidencial.
+Quer ajudar? Abra uma issue **"Novo provedor / LLM"** e um PR para a branch `stage` (veja [CONTRIBUTING.md](CONTRIBUTING.md)). Todo provedor novo entra **desligado** (stand-by) e na lista de provedores externos, para nunca receber dado confidencial.
 
 | Prioridade | Provedor | Modelo mais recente (ID da API) | API | Base URL | Chave sugerida | Esforço | Status |
 |---|---|---|---|---|---|---|---|

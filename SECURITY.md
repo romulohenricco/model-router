@@ -25,4 +25,4 @@ Só a versão mais recente indicada no [BACKLOG.md](BACKLOG.md).
 
 - Zero dependências npm.
 - Catálogo guarda só referências (`env:`/`op://`), nunca valores.
-- `main` e `next` protegidas: merge só com aprovação do CODEOWNER e CI verde; sem force-push.
+- `main` e `stage` protegidas: merge só com aprovação do CODEOWNER e CI verde; sem force-push.
